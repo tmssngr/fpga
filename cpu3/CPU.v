@@ -18,6 +18,8 @@ module CPU(
         asm_ldc(0, 10);
         asm_ldc(1, 20);
         asm_add(0, 1);
+        asm_nop();
+        asm_jump(16'h0002);
     end
 
     reg [7:0] registers[0:15];
@@ -48,7 +50,7 @@ module CPU(
     localparam STATE_FETCH_INSTR = 0;
     localparam STATE_BYTE1       = 1;
     localparam STATE_BYTE2       = 2;
-    localparam STATE_EXEC        = 3;
+    localparam STATE_JUMP        = 3;
     reg [1:0] state = STATE_FETCH_INSTR;
 
     always @(posedge clk) begin
@@ -66,12 +68,18 @@ module CPU(
         end
         
         STATE_BYTE1: begin
-            data <= memory[pc];
-            pc <= pc + 1;
-            state <= STATE_BYTE2;
+            if ((instrLow & 4'hE) == 4'hE) begin
+                state <= STATE_FETCH_INSTR;
+            end
+            else begin
+                data <= memory[pc];
+                pc <= pc + 1;
+                state <= STATE_BYTE2;
+            end
         end
         
         STATE_BYTE2: begin
+            state <= STATE_FETCH_INSTR;
             case (instrLow)
             4'h2: begin
                 if (instrHigh == 0) begin
@@ -95,7 +103,15 @@ module CPU(
                 aluMode <= ALU_LD;
                 writeBackEn <= 1;
             end
+            4'hD: begin
+                valueDst <= memory[pc];
+                state <= STATE_JUMP;
+            end
             endcase
+        end
+
+        STATE_JUMP: begin
+            pc <= {data, valueDst};
             state <= STATE_FETCH_INSTR;
         end
 
