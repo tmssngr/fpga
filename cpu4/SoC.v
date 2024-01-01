@@ -52,7 +52,7 @@ module Processor(
     reg [7:0] registers[0:15];
     reg [7:0] valueDst;
     reg [7:0] valueSrc;
-    
+
     wire [7:0] valueWriteBack;
     reg [3:0] writeRegister;
     reg writeBackEn = 0;
@@ -94,13 +94,13 @@ module Processor(
         STATE_FETCH_INSTR: begin
             state <= state + 1;
         end
-        
+
         STATE_READ_INSTR: begin
             instruction <= memDataRead;
             pc <= pc + 1;
             state <= state + 1;
         end
-        
+
         STATE_EXEC_1: begin
             if (isInstrSize1) begin
                 state <= STATE_FETCH_INSTR;
@@ -115,7 +115,7 @@ module Processor(
             pc <= pc + 1;
             state <= state + 1;
         end
-        
+
         STATE_EXEC_2: begin
             if (isInstrSize3) begin
                 state <= state + 1;
@@ -173,7 +173,6 @@ module Processor(
     assign memStrobe = (state == STATE_FETCH_INSTR)
                      | (state == STATE_EXEC_1 & ~isInstrSize1)
                      | (state == STATE_EXEC_2 & isInstrSize3);
-
 endmodule
 
 module SoC(
@@ -197,5 +196,4 @@ module SoC(
         .memDataRead(memData),
         .memStrobe(memStrobe)
     );
-
 endmodule
