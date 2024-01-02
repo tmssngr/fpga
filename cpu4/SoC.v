@@ -48,6 +48,7 @@ module Processor(
     reg [7:0] third;
     wire [3:0] thirdH = third[7:4];
     wire [3:0] thirdL = third[3:0];
+    wire [15:0] directAddress = {second, third};
 
     reg [7:0] registers[0:15];
     reg [7:0] valueDst;
@@ -85,6 +86,7 @@ module Processor(
 
     always @(posedge clk) begin
         if (writeBackEn) begin
+            $display("    reg[%h] = %2h", writeRegister, valueWriteBack);
             registers[writeRegister] <= valueWriteBack;
         end
 
@@ -92,6 +94,7 @@ module Processor(
 
         case (state)
         STATE_FETCH_INSTR: begin
+            $display("\n%h: read instruction", pc);
             state <= state + 1;
         end
 
@@ -102,6 +105,7 @@ module Processor(
         end
 
         STATE_EXEC_1: begin
+            $display("  %h", instruction);
             if (isInstrSize1) begin
                 state <= STATE_FETCH_INSTR;
             end
@@ -111,12 +115,14 @@ module Processor(
         end
 
         STATE_READ_2: begin
+            $display("%h: read 2nd byte", pc);
             second <= memDataRead;
             pc <= pc + 1;
             state <= state + 1;
         end
 
         STATE_EXEC_2: begin
+            $display("  %h %h", instruction, second);
             if (isInstrSize3) begin
                 state <= state + 1;
             end
@@ -125,6 +131,7 @@ module Processor(
                 case (instrL)
                 4'h2: begin
                     if (instrH == 0) begin
+                        $display("    add r%h, r%h", secondH, secondL);
                         writeRegister <= secondH;
                         valueDst <= registers[secondH];
                         valueSrc <= registers[secondL];
@@ -133,13 +140,14 @@ module Processor(
                     end
                 end
                 4'h8: begin
+                    $display("    ld r%h, r%h", instrH, secondL);
                     writeRegister <= instrH;
-                    valueDst <= registers[instrH];
                     valueSrc <= registers[secondL];
                     aluMode <= ALU_LD;
                     writeBackEn <= 1;
                 end
                 4'hC: begin
+                    $display("    ld r%h, #%h", instrH, second);
                     writeRegister <= instrH;
                     valueDst <= second;
                     aluMode <= ALU_LD;
@@ -150,16 +158,19 @@ module Processor(
         end
 
         STATE_READ_3: begin
+            $display("%h: read 3rd byte", pc);
             third <= memDataRead;
             pc <= pc + 1;
             state <= state + 1;
         end
 
         STATE_EXEC_3: begin
+            $display("  %h %h %h", instruction, second, third);
             state <= STATE_FETCH_INSTR;
             case (instrL)
             4'hD: begin // jump
-                pc <= {second, third};
+                $display("    jmp %h", directAddress);
+                pc <= directAddress;
             end
             default: begin
             end
