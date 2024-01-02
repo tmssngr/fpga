@@ -7,12 +7,14 @@ module Memory(
 
     reg [7:0] memory[0:255];
 `include "assembly.inc"
+    localparam L0_ = 16'h2;
     initial begin
-        asm_ldc(0, 10); // 0C 0A
-        asm_ldc(1, 20); // 1C 14
-        asm_add(0, 1);  // 02 01
-        asm_nop();      // FF
-        asm_jump(16'h0002); // 8D 00 02
+          asm_ldc(0, 10); // 0C 0A
+        label(L0_);
+          asm_ldc(1, 20); // 1C 14
+          asm_add(0, 1);  // 02 01
+          asm_nop();      // FF
+          asm_jump(L0_); // 8D 00 02
     end
 
     always @(posedge clk) begin

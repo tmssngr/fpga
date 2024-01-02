@@ -1,4 +1,15 @@
 integer memPC = 0;
+
+task label;
+    input [7:0] l;
+    begin
+        if (l != memPC) begin
+            $display("%m expected label at %h", memPC);
+            $finish(0);
+        end
+    end
+endtask
+
 task asm1;
     input [7:0] a;
     begin
