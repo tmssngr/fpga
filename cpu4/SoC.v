@@ -39,8 +39,8 @@ module Processor(
     reg [7:0] instruction;
     wire [3:0] instrH = instruction[7:4];
     wire [3:0] instrL = instruction[3:0];
-    wire isInstrSize1 = (instruction[7:5] == 3'b111);
-    wire isInstrSize3 = (instruction[7:6] == 2'b01)
+    wire isInstrSize1 = (instrL[3:1] == 3'b111);
+    wire isInstrSize3 = (instrL[3:2] == 2'b01)
                       | (instrL == 4'hD);
 
     reg [7:0] second;
