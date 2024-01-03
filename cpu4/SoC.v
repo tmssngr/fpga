@@ -9,10 +9,16 @@ module Memory(
 `include "assembly.inc"
     localparam L0_ = 16'h2;
     initial begin
-          asm_ldc(0, 10); // 0C 0A
+          asm_ldc(0, 9);  // 0C 09
         label(L0_);
-          asm_ldc(1, 20); // 1C 14
+          asm_ldc(1, 10); // 1C 0A
+          asm_tcm(0, 1);  // 62 01
+          asm_tm(0, 1);   // 72 01
           asm_add(0, 1);  // 02 01
+          asm_sub(0, 1);  // 22 01
+          asm_or(0, 1);   // 42 01
+          asm_and(0, 1);  // 52 01
+          asm_xor(0, 1);  // 52 01
           asm_nop();      // FF
           asm_jump(L0_); // 8D 00 02
     end
@@ -49,6 +55,26 @@ module Alu8(
             outFlags[FLAG_INDEX_C] = cH;
             outFlags[FLAG_INDEX_D] = 0;
             outFlags[FLAG_INDEX_V] = (a[7] == b[7]) & (a[7] != out[7]);
+        end
+        ALU8_SUB: begin
+            { cL, out[3:0] } = { 1'b0, a[3:0] } - { 1'b0, b[3:0] };
+            outFlags[FLAG_INDEX_H] = cL;
+            { cH, out[7:4] } = { 1'b0, a[7:4] } - { 1'b0, b[7:4] } - { 4'b0000, cL };
+            outFlags[FLAG_INDEX_C] = cH;
+            outFlags[FLAG_INDEX_D] = 1;
+            outFlags[FLAG_INDEX_V] = (a[7] == b[7]) & (a[7] != out[7]);
+        end
+        ALU8_OR: begin
+            out = a | b;
+            outFlags[FLAG_INDEX_V] = 0;
+        end
+        ALU8_AND: begin
+            out = a & b;
+            outFlags[FLAG_INDEX_V] = 0;
+        end
+        ALU8_XOR: begin
+            out = a ^ b;
+            outFlags[FLAG_INDEX_V] = 0;
         end
         default:
             out <= a;
@@ -121,17 +147,19 @@ module Processor(
     reg [2:0] state = STATE_FETCH_INSTR;
 
     always @(posedge clk) begin
+        if (writeFlags) begin
+            $display("    alu:    %h       %h    =>    %h", valueDst, valueSrc, aluOut);
+            $display("         %b %b => %b", valueDst, valueSrc, aluOut);
+            $display("    flags = %b_%b", flagsOut[7:4], flagsOut[3:0]);
+            flagsIn <= flagsOut;
+        end
+        writeFlags <= 0;
+
         if (writeBackEn) begin
             $display("    reg[%h] = %h", writeRegister, valueWriteBack);
             registers[writeRegister] <= valueWriteBack;
         end
         writeBackEn <= 0;
-
-        if (writeFlags) begin
-            $display("    flags = %b_%b", flagsOut[7:4], flagsOut[3:0]);
-            flagsIn <= flagsOut;
-        end
-        writeFlags <= 0;
 
         case (state)
         STATE_FETCH_INSTR: begin
@@ -171,7 +199,8 @@ module Processor(
                 state <= STATE_FETCH_INSTR;
                 case (instrL)
                 4'h2: begin
-                    if (instrH == 0) begin
+                    case (instrH)
+                    4'h0: begin
                         $display("    add r%h, r%h", secondH, secondL);
                         writeRegister <= secondH;
                         valueDst <= registers[secondH];
@@ -180,6 +209,91 @@ module Processor(
                         writeBackEn <= 1;
                         writeFlags <= 1;
                     end
+                    4'h1: begin
+                        $display("    adc r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_ADC;
+                        writeBackEn <= 1;
+                        writeFlags <= 1;
+                    end
+                    4'h2: begin
+                        $display("    sub r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_SUB;
+                        writeBackEn <= 1;
+                        writeFlags <= 1;
+                    end
+                    4'h3: begin
+                        $display("    sbc r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_SBC;
+                        writeBackEn <= 1;
+                        writeFlags <= 1;
+                    end
+                    4'h4: begin
+                        $display("    or r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_OR;
+                        writeBackEn <= 1;
+                        writeFlags <= 1;
+                    end
+                    4'h5: begin
+                        $display("    and r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_AND;
+                        writeBackEn <= 1;
+                        writeFlags <= 1;
+                    end
+                    4'h6: begin
+                        $display("    tcm r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= ~registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_AND;
+                        writeBackEn <= 0;
+                        writeFlags <= 1;
+                    end
+                    4'h7: begin
+                        $display("    tm r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_AND;
+                        writeBackEn <= 0;
+                        writeFlags <= 1;
+                    end
+                    4'hA: begin
+                        $display("    cp r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_SUB;
+                        writeBackEn <= 0;
+                        writeFlags <= 1;
+                    end
+                    4'hB: begin
+                        $display("    xor r%h, r%h", secondH, secondL);
+                        writeRegister <= secondH;
+                        valueDst <= registers[secondH];
+                        valueSrc <= registers[secondL];
+                        aluMode <= ALU8_XOR;
+                        writeBackEn <= 1;
+                        writeFlags <= 1;
+                    end
+                    default: begin
+                        $display("    ?", instruction);
+                    end
+                    endcase
                 end
                 4'h8: begin
                     $display("    ld r%h, r%h", instrH, secondL);
