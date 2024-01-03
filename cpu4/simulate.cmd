@@ -28,7 +28,10 @@ if exist %NAME%.vcd del %NAME%.vcd
 ::                 [-s topmodule] [-t target] [-T min|typ|max]
 ::                 [-W class] [-y dir] [-Y suf] [-l file] source_file(s)
 iverilog -o %NAME_TB%.o -s test%NAME% %NAME%.v %NAME_TB%.v
-
+if  %ERRORLEVEL% NEQ 0 (
+    echo FAILURE
+    goto continue
+)
 :: Usage: vvp [options] input-file [+plusargs...]
 :: Options:
 ::  -h             Print this help message.
@@ -44,5 +47,7 @@ iverilog -o %NAME_TB%.o -s test%NAME% %NAME%.v %NAME_TB%.v
 ::  -V             Print the version information.
 vvp %NAME_TB%.o > %NAME%.txt
 type %NAME%.txt
+
+:continue
 echo:
 goto :eof
