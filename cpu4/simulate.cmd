@@ -42,6 +42,7 @@ iverilog -o %NAME_TB%.o -s test%NAME% %NAME%.v %NAME_TB%.v
 ::  -s             $stop right away.
 ::  -v             Verbose progress messages.
 ::  -V             Print the version information.
-vvp %NAME_TB%.o
+vvp %NAME_TB%.o > %NAME%.txt
+type %NAME%.txt
 echo:
 goto :eof
