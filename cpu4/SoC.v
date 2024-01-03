@@ -24,6 +24,25 @@ module Memory(
     end
 endmodule
 
+module Alu8(
+    input [7:0] in1,
+    input [7:0] in2,
+    input [1:0] mode,
+    output reg [7:0] out
+);
+    `include "alu.vh"
+
+    always @(*) begin
+        case (mode)
+        ALU8_ADD: begin
+            out <= in1 + in2;
+        end
+        default:
+            out <= in1;
+        endcase
+    end
+endmodule
+
 module Processor(
     input clk,
     output [7:0] memAddr,
@@ -60,22 +79,16 @@ module Processor(
     reg [3:0] writeRegister;
     reg writeBackEn = 0;
 
-    wire [7:0] aluIn1 = valueDst;
-    wire [7:0] aluIn2 = valueSrc;
-    reg [7:0] aluOut;
-    assign valueWriteBack = aluOut;
-
-    localparam ALU_LD = 0;
-    localparam ALU_ADD = 1;
+    `include "alu.vh"
+    wire [7:0] aluOut;
     reg [1:0] aluMode = 0;
-
-    always @(*) begin
-        case (aluMode)
-        ALU_ADD: aluOut = aluIn1 + aluIn2;
-        ALU_LD:  aluOut = aluIn1;
-        default: aluOut = aluIn1;
-        endcase
-    end
+    Alu8 alu8(
+        .in1(valueDst),
+        .in2(valueSrc),
+        .mode(aluMode),
+        .out(aluOut)
+    );
+    assign valueWriteBack = aluOut;
 
     localparam STATE_FETCH_INSTR  = 0;
     localparam STATE_READ_INSTR   = 1;
@@ -137,7 +150,7 @@ module Processor(
                         writeRegister <= secondH;
                         valueDst <= registers[secondH];
                         valueSrc <= registers[secondL];
-                        aluMode <= ALU_ADD;
+                        aluMode <= ALU8_ADD;
                         writeBackEn <= 1;
                     end
                 end
@@ -145,14 +158,14 @@ module Processor(
                     $display("    ld r%h, r%h", instrH, secondL);
                     writeRegister <= instrH;
                     valueSrc <= registers[secondL];
-                    aluMode <= ALU_LD;
+                    aluMode <= ALU8_LD;
                     writeBackEn <= 1;
                 end
                 4'hC: begin
                     $display("    ld r%h, #%h", instrH, second);
                     writeRegister <= instrH;
                     valueDst <= second;
-                    aluMode <= ALU_LD;
+                    aluMode <= ALU8_LD;
                     writeBackEn <= 1;
                 end
                 endcase
