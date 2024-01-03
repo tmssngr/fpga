@@ -20,6 +20,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   02 01
     add r0, r1
     reg[0] = 1e
+    flags = 0000_0000
 
 06: read instruction
   ff
@@ -45,6 +46,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   02 01
     add r0, r1
     reg[0] = 32
+    flags = 0000_0100
 
 06: read instruction
   ff
@@ -70,6 +72,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   02 01
     add r0, r1
     reg[0] = 46
+    flags = 0000_0000
 
 06: read instruction
   ff
@@ -95,6 +98,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   02 01
     add r0, r1
     reg[0] = 5a
+    flags = 0000_0000
 
 06: read instruction
 testSoC: SUCCESS

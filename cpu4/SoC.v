@@ -24,22 +24,38 @@ module Memory(
     end
 endmodule
 
+// see https://github.com/Time0o/z80-verilog/blob/master/source/rtl/alu.v
 module Alu8(
-    input [7:0] in1,
-    input [7:0] in2,
     input [1:0] mode,
-    output reg [7:0] out
+    input [7:0] a,
+    input [7:0] b,
+    input [7:0] flags,
+    output reg [7:0] out,
+    output reg [7:0] outFlags
 );
     `include "alu.vh"
+    `include "flags.vh"
+
+    reg cL, cH;
 
     always @(*) begin
+        outFlags = flags;
+
         case (mode)
         ALU8_ADD: begin
-            out <= in1 + in2;
+            { cL, out[3:0] } = { 1'b0, a[3:0] } + { 1'b0, b[3:0] };
+            outFlags[FLAG_INDEX_H] = cL;
+            { cH, out[7:4] } = { 1'b0, a[7:4] } + { 1'b0, b[7:4] } + { 4'b0000, cL };
+            outFlags[FLAG_INDEX_C] = cH;
+            outFlags[FLAG_INDEX_D] = 0;
+            outFlags[FLAG_INDEX_V] = (a[7] == b[7]) & (a[7] != out[7]);
         end
         default:
-            out <= in1;
+            out <= a;
         endcase
+
+        outFlags[FLAG_INDEX_Z] = (out == 0);
+        outFlags[FLAG_INDEX_S] = out[7];
     end
 endmodule
 
@@ -81,12 +97,17 @@ module Processor(
 
     `include "alu.vh"
     wire [7:0] aluOut;
+    wire [7:0] flagsOut;
     reg [1:0] aluMode = 0;
+    reg [7:0] flagsIn = 0;
+    reg writeFlags = 0;
     Alu8 alu8(
-        .in1(valueDst),
-        .in2(valueSrc),
         .mode(aluMode),
-        .out(aluOut)
+        .a(valueDst),
+        .b(valueSrc),
+        .flags(flagsIn),
+        .out(aluOut),
+        .outFlags(flagsOut)
     );
     assign valueWriteBack = aluOut;
 
@@ -101,11 +122,16 @@ module Processor(
 
     always @(posedge clk) begin
         if (writeBackEn) begin
-            $display("    reg[%h] = %2h", writeRegister, valueWriteBack);
+            $display("    reg[%h] = %h", writeRegister, valueWriteBack);
             registers[writeRegister] <= valueWriteBack;
         end
-
         writeBackEn <= 0;
+
+        if (writeFlags) begin
+            $display("    flags = %b_%b", flagsOut[7:4], flagsOut[3:0]);
+            flagsIn <= flagsOut;
+        end
+        writeFlags <= 0;
 
         case (state)
         STATE_FETCH_INSTR: begin
@@ -152,6 +178,7 @@ module Processor(
                         valueSrc <= registers[secondL];
                         aluMode <= ALU8_ADD;
                         writeBackEn <= 1;
+                        writeFlags <= 1;
                     end
                 end
                 4'h8: begin
