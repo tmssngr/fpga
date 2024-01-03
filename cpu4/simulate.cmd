@@ -5,11 +5,38 @@ call C:\oss-cad-suite\environment.bat
 
 :repeat
 cls
-call :simulate SoC
+::call :simulate SoC
+call :test add
 
 pause
 goto :repeat
 exit
+
+
+:: ======================
+:test
+set TEST=%~1
+set NAME=SoC
+set INCLUDE_DIR=..\..
+
+echo testing %TEST%
+echo -------------
+pushd testcases\%TEST%
+iverilog -o test.o -I . -I %INCLUDE_DIR% -s test%NAME% %INCLUDE_DIR%\%NAME%.v %INCLUDE_DIR%\%NAME%_tb.v
+if  %ERRORLEVEL% NEQ 0 (
+    echo FAILURE
+	popd
+	goto :eof
+)
+
+vvp test.o > output.txt
+if  %ERRORLEVEL% NEQ 0 (
+    echo FAILURE
+	type output.txt
+)
+popd
+goto :eof
+
 
 :: ======================
 :simulate

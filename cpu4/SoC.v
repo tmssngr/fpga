@@ -7,21 +7,7 @@ module Memory(
 
     reg [7:0] memory[0:255];
 `include "assembly.inc"
-    localparam L0_ = 16'h2;
-    initial begin
-          asm_ldc(0, 9);  // 0C 09
-        label(L0_);
-          asm_ldc(1, 10); // 1C 0A
-          asm_tcm(0, 1);  // 62 01
-          asm_tm(0, 1);   // 72 01
-          asm_add(0, 1);  // 02 01
-          asm_sub(0, 1);  // 22 01
-          asm_or(0, 1);   // 42 01
-          asm_and(0, 1);  // 52 01
-          asm_xor(0, 1);  // 52 01
-          asm_nop();      // FF
-          asm_jump(L0_); // 8D 00 02
-    end
+`include "program.inc"
 
     always @(posedge clk) begin
         if (strobe) begin
@@ -125,13 +111,13 @@ module Processor(
     wire [7:0] aluOut;
     wire [7:0] flagsOut;
     reg [1:0] aluMode = 0;
-    reg [7:0] flagsIn = 0;
+    reg [7:0] flags = 0;
     reg writeFlags = 0;
     Alu8 alu8(
         .mode(aluMode),
         .a(valueDst),
         .b(valueSrc),
-        .flags(flagsIn),
+        .flags(flags),
         .out(aluOut),
         .outFlags(flagsOut)
     );
@@ -151,7 +137,7 @@ module Processor(
             $display("    alu:    %h       %h    =>    %h", valueDst, valueSrc, aluOut);
             $display("         %b %b => %b", valueDst, valueSrc, aluOut);
             $display("    flags = %b_%b", flagsOut[7:4], flagsOut[3:0]);
-            flagsIn <= flagsOut;
+            flags <= flagsOut;
         end
         writeFlags <= 0;
 
