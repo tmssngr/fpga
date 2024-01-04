@@ -102,6 +102,7 @@ module Processor(
     input  [7:0] memDataRead,
     output       memStrobe
 );
+    `include "flags.vh"
 
     reg [7:0] pc;
     initial begin
@@ -193,12 +194,54 @@ module Processor(
 
         STATE_EXEC_1: begin
             $display("  %h", instruction);
-            if (isInstrSize1) begin
-                state <= STATE_FETCH_INSTR;
+            case (instrL)
+            4'hE: begin
+                $display("    inc r%h", instrH);
+                //TODO
             end
-            else begin
+            4'hF: begin
+                state <= STATE_FETCH_INSTR;
+                case (instrH)
+                4'h8: begin
+                    $display("    di");
+                    //TODO
+                end
+                4'h9: begin
+                    $display("    ei");
+                    //TODO
+                end
+                4'hA: begin
+                    $display("    ret");
+                    //TODO
+                end
+                4'hB: begin
+                    $display("    iret");
+                    //TODO
+                end
+                4'hC: begin
+                    $display("    rcf");
+                    flags[FLAG_INDEX_C] <= 0;
+                end
+                4'hD: begin
+                    $display("    scf");
+                    flags[FLAG_INDEX_C] <= 1;
+                end
+                4'hE: begin
+                    $display("    ccf");
+                    flags[FLAG_INDEX_C] <= ~flags[FLAG_INDEX_C];
+                end
+                4'hF: begin
+                    $display("    nop");
+                end
+                default: begin
+                    $display("    ?");
+                end
+                endcase
+            end
+            default: begin
                 state <= state + 1;
             end
+            endcase
         end
 
         STATE_READ_2: begin
@@ -319,6 +362,18 @@ module Processor(
                     valueSrc <= registers[secondL];
                     aluMode <= ALU8_LD;
                     writeBackEn <= 1;
+                end
+                4'h9: begin
+                    $display("    ld %h, r%h", secondL, instrH);
+                    //TODO
+                end
+                4'hA: begin
+                    $display("    djnz r%h, %h", instrH, secondL);
+                    //TODO
+                end
+                4'hB: begin
+                    $display("    jr %h, %h", instrH, secondL);
+                    //TODO
                 end
                 4'hC: begin
                     $display("    ld r%h, #%h", instrH, second);
