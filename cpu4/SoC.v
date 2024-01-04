@@ -284,7 +284,7 @@ module Processor(
                     endcase
                 end
                 4'h8: begin
-                    $display("    ld r%h, r%h", instrH, secondL);
+                    $display("    ld r%h, %h", instrH, secondL);
                     writeRegister <= instrH;
                     valueSrc <= registers[secondL];
                     aluMode <= ALU8_LD;
