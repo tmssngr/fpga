@@ -18,5 +18,5 @@ initial begin
       asm_ldc(1, -1);  // 0C FF
       asm_add(1, 0);   // 02 10
 
-      asm_jump(L0_);  // 8D 00 02
+      asm_jp(JC_ALWAYS, L0_);  // 8D 00 02
 end

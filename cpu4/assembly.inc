@@ -140,9 +140,26 @@ task asm_xor;
     end
 endtask
 
-task asm_jump;
+localparam JC_NEVER = 0;
+localparam JC_LT = 1;
+localparam JC_LE = 2;
+localparam JC_ULE = 3;
+localparam JC_OV = 4;
+localparam JC_MI = 5;
+localparam JC_Z = 6;
+localparam JC_C = 7;
+localparam JC_ALWAYS = 8;
+localparam JC_GE = 9;
+localparam JC_GT = 10;
+localparam JC_UGT = 11;
+localparam JC_NOV = 12;
+localparam JC_PL = 13;
+localparam JC_NZ = 14;
+localparam JC_NC = 15;
+task asm_jp;
+	input [3:0] condition;
     input [15:0] addr;
     begin
-        asm3(8'h8D, addr[15:8], addr[7:0]);
+        asm3({ condition, 4'hD }, addr[15:8], addr[7:0]);
     end
 endtask

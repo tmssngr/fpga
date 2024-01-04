@@ -105,7 +105,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   8d 00
 1a: read 3rd byte
   8d 00 00
-    jmp 0000
+    jmp 8, 0000
 
 00: read instruction
 testSoC: SUCCESS

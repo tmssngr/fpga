@@ -7,6 +7,7 @@ call C:\oss-cad-suite\environment.bat
 cls
 ::call :simulate SoC
 call :test add
+call :test jp
 
 pause
 goto :repeat
