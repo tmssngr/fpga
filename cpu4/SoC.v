@@ -104,7 +104,7 @@ module JumpCondition(
 endmodule
 
 module Processor(
-    input clk,
+    input        clk,
     output [7:0] memAddr,
     input  [7:0] memDataRead,
     output       memStrobe
@@ -116,45 +116,43 @@ module Processor(
         pc = 0;
     end
 
-    reg [7:0] instruction;
+    reg  [7:0] instruction;
     wire [3:0] instrH = instruction[7:4];
     wire [3:0] instrL = instruction[3:0];
     wire isInstrSize1 = (instrL[3:1] == 3'b111);
     wire isInstrSize3 = (instrL[3:2] == 2'b01)
                       | (instrL == 4'hD);
 
-    reg [7:0] second;
+    reg  [7:0] second;
     wire [3:0] secondH = second[7:4];
     wire [3:0] secondL = second[3:0];
 
-    reg [7:0] third;
+    reg  [7:0] third;
     wire [3:0] thirdH = third[7:4];
     wire [3:0] thirdL = third[3:0];
     wire [15:0] directAddress = {second, third};
 
     reg [7:0] registers[0:15];
-    reg [7:0] valueDst;
-    reg [7:0] valueSrc;
 
-    wire [7:0] valueWriteBack;
-    reg [3:0] writeRegister;
-    reg writeBackEn = 0;
+    reg [3:0] dstRegister;
+    reg writeRegister = 0;
 
     `include "alu.vh"
+    reg  [7:0] aluA;
+    reg  [7:0] aluB;
+    reg  [3:0] aluMode;
     wire [7:0] aluOut;
+    reg  [7:0] flags = 0;
     wire [7:0] flagsOut;
-    reg [3:0] aluMode = 0;
-    reg [7:0] flags = 0;
     reg writeFlags = 0;
     Alu8 alu8(
         .mode(aluMode),
-        .a(valueDst),
-        .b(valueSrc),
+        .a(aluA),
+        .b(aluB),
         .flags(flags),
         .out(aluOut),
         .outFlags(flagsOut)
     );
-    assign valueWriteBack = aluOut;
 
     wire jumpCondition;
     JumpCondition jc(
@@ -174,18 +172,18 @@ module Processor(
 
     always @(posedge clk) begin
         if (writeFlags) begin
-            $display("    alu:    %h       %h    =>    %h", valueDst, valueSrc, aluOut);
-            $display("         %b %b => %b", valueDst, valueSrc, aluOut);
+            $display("    alu:    %h       %h    =>    %h", aluA, aluB, aluOut);
+            $display("         %b %b => %b", aluA, aluB, aluOut);
             $display("    flags = %b_%b", flagsOut[7:4], flagsOut[3:0]);
             flags <= flagsOut;
         end
         writeFlags <= 0;
 
-        if (writeBackEn) begin
-            $display("    reg[%h] = %h", writeRegister, valueWriteBack);
-            registers[writeRegister] <= valueWriteBack;
+        if (writeRegister) begin
+            $display("    reg[%h] = %h", dstRegister, aluOut);
+            registers[dstRegister] <= aluOut;
         end
-        writeBackEn <= 0;
+        writeRegister <= 0;
 
         case (state)
         STATE_FETCH_INSTR: begin
@@ -286,13 +284,13 @@ module Processor(
                                  instrH == ALU8_CP  ? "cp" :
                                  instrH == ALU8_XOR ? "xor" : "?",
                                  secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
+                        dstRegister <= secondH;
+                        aluA <= registers[secondH];
+                        aluB <= registers[secondL];
                         aluMode <= instrH;
-                        writeBackEn <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
-                                     | (instrH[3:1] == 3'b010)   // or, and
-                                     | (instrH      == 4'b1011); // xor
+                        writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
+                                       | (instrH[3:1] == 3'b010)   // or, and
+                                       | (instrH      == 4'b1011); // xor
                         writeFlags <= 1;
                     end
                     default: begin
@@ -302,10 +300,10 @@ module Processor(
                 end
                 4'h8: begin
                     $display("    ld r%h, %h", instrH, secondL);
-                    writeRegister <= instrH;
-                    valueSrc <= registers[secondL];
+                    dstRegister <= instrH;
+                    aluB <= registers[secondL];
                     aluMode <= ALU8_LD;
-                    writeBackEn <= 1;
+                    writeRegister <= 1;
                 end
                 4'h9: begin
                     $display("    ld %h, r%h", secondL, instrH);
@@ -321,10 +319,10 @@ module Processor(
                 end
                 4'hC: begin
                     $display("    ld r%h, #%h", instrH, second);
-                    writeRegister <= instrH;
-                    valueDst <= second;
+                    dstRegister <= instrH;
+                    aluA <= second;
                     aluMode <= ALU8_LD;
-                    writeBackEn <= 1;
+                    writeRegister <= 1;
                 end
                 endcase
             end
@@ -363,13 +361,13 @@ module Processor(
                                 instrH == ALU8_CP  ? "cp" :
                                 instrH == ALU8_XOR ? "xor" : "?",
                                 second, third);
-                    writeRegister <= second;
-                    valueDst <= registers[secondL];
-                    valueSrc <= third;
+                    dstRegister <= second;
+                    aluA <= registers[secondL];
+                    aluB <= third;
                     aluMode <= instrH;
-                    writeBackEn <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
-                                 | (instrH[3:1] == 3'b010)   // or, and
-                                 | (instrH      == 4'b1011); // xor
+                    writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
+                                   | (instrH[3:1] == 3'b010)   // or, and
+                                   | (instrH      == 4'b1011); // xor
                     writeFlags <= 1;
                 end
             4'hD: begin // jump
