@@ -20,7 +20,7 @@ endmodule
 
 // see https://github.com/Time0o/z80-verilog/blob/master/source/rtl/alu.v
 module Alu8(
-    input [1:0] mode,
+    input [3:0] mode,
     input [7:0] a,
     input [7:0] b,
     input [7:0] flags,
@@ -31,21 +31,25 @@ module Alu8(
     `include "flags.vh"
 
     reg cL, cH;
+    reg [7:0] a_and;
 
     always @(*) begin
         outFlags = flags;
 
         case (mode)
-        ALU8_ADD: begin
-            { cL, out[3:0] } = { 1'b0, a[3:0] } + { 1'b0, b[3:0] };
+        ALU8_ADD,
+        ALU8_ADC: begin
+            { cL, out[3:0] } = { 1'b0, a[3:0] } + { 1'b0, b[3:0] } + { 8'b0, flags[FLAG_INDEX_C] & mode[0] };
             outFlags[FLAG_INDEX_H] = cL;
             { cH, out[7:4] } = { 1'b0, a[7:4] } + { 1'b0, b[7:4] } + { 4'b0000, cL };
             outFlags[FLAG_INDEX_C] = cH;
             outFlags[FLAG_INDEX_D] = 0;
             outFlags[FLAG_INDEX_V] = (a[7] == b[7]) & (a[7] != out[7]);
         end
-        ALU8_SUB: begin
-            { cL, out[3:0] } = { 1'b0, a[3:0] } - { 1'b0, b[3:0] };
+        ALU8_SUB,
+        ALU8_SBC,
+        ALU8_CP: begin
+            { cL, out[3:0] } = { 1'b0, a[3:0] } - { 1'b0, b[3:0] } - { 8'b0, flags[FLAG_INDEX_C] & mode[0] };
             outFlags[FLAG_INDEX_H] = cL;
             { cH, out[7:4] } = { 1'b0, a[7:4] } - { 1'b0, b[7:4] } - { 4'b0000, cL };
             outFlags[FLAG_INDEX_C] = cH;
@@ -56,8 +60,11 @@ module Alu8(
             out = a | b;
             outFlags[FLAG_INDEX_V] = 0;
         end
-        ALU8_AND: begin
-            out = a & b;
+        ALU8_AND,
+        ALU8_TCM,
+        ALU8_TM: begin
+            a_and = mode[0] ? a : ~a;
+            out = a_and & b;
             outFlags[FLAG_INDEX_V] = 0;
         end
         ALU8_XOR: begin
@@ -136,7 +143,7 @@ module Processor(
     `include "alu.vh"
     wire [7:0] aluOut;
     wire [7:0] flagsOut;
-    reg [1:0] aluMode = 0;
+    reg [3:0] aluMode = 0;
     reg [7:0] flags = 0;
     reg writeFlags = 0;
     Alu8 alu8(
@@ -257,94 +264,35 @@ module Processor(
                 case (instrL)
                 4'h2: begin
                     case (instrH)
-                    4'h0: begin
-                        $display("    add r%h, r%h", secondH, secondL);
+                    ALU8_ADD,
+                    ALU8_ADC,
+                    ALU8_SUB,
+                    ALU8_SBC,
+                    ALU8_OR,
+                    ALU8_AND,
+                    ALU8_TCM,
+                    ALU8_TM,
+                    ALU8_CP,
+                    ALU8_XOR: begin
+                        $display("    %s r%h, r%h",
+                                 instrH == ALU8_ADD ? "add" :
+                                 instrH == ALU8_ADC ? "adc" :
+                                 instrH == ALU8_SUB ? "sub" :
+                                 instrH == ALU8_SBC ? "sbc" :
+                                 instrH == ALU8_OR  ? "or" :
+                                 instrH == ALU8_AND ? "and" :
+                                 instrH == ALU8_TCM ? "tcm" :
+                                 instrH == ALU8_TM  ? "tm" :
+                                 instrH == ALU8_CP  ? "cp" :
+                                 instrH == ALU8_XOR ? "xor" : "?",
+                                 secondH, secondL);
                         writeRegister <= secondH;
                         valueDst <= registers[secondH];
                         valueSrc <= registers[secondL];
-                        aluMode <= ALU8_ADD;
-                        writeBackEn <= 1;
-                        writeFlags <= 1;
-                    end
-                    4'h1: begin
-                        $display("    adc r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_ADC;
-                        writeBackEn <= 1;
-                        writeFlags <= 1;
-                    end
-                    4'h2: begin
-                        $display("    sub r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_SUB;
-                        writeBackEn <= 1;
-                        writeFlags <= 1;
-                    end
-                    4'h3: begin
-                        $display("    sbc r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_SBC;
-                        writeBackEn <= 1;
-                        writeFlags <= 1;
-                    end
-                    4'h4: begin
-                        $display("    or r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_OR;
-                        writeBackEn <= 1;
-                        writeFlags <= 1;
-                    end
-                    4'h5: begin
-                        $display("    and r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_AND;
-                        writeBackEn <= 1;
-                        writeFlags <= 1;
-                    end
-                    4'h6: begin
-                        $display("    tcm r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= ~registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_AND;
-                        writeBackEn <= 0;
-                        writeFlags <= 1;
-                    end
-                    4'h7: begin
-                        $display("    tm r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_AND;
-                        writeBackEn <= 0;
-                        writeFlags <= 1;
-                    end
-                    4'hA: begin
-                        $display("    cp r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_SUB;
-                        writeBackEn <= 0;
-                        writeFlags <= 1;
-                    end
-                    4'hB: begin
-                        $display("    xor r%h, r%h", secondH, secondL);
-                        writeRegister <= secondH;
-                        valueDst <= registers[secondH];
-                        valueSrc <= registers[secondL];
-                        aluMode <= ALU8_XOR;
-                        writeBackEn <= 1;
+                        aluMode <= instrH;
+                        writeBackEn <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
+                                     | (instrH[3:1] == 3'b010)   // or, and
+                                     | (instrH      == 4'b1011); // xor
                         writeFlags <= 1;
                     end
                     default: begin
