@@ -44,6 +44,24 @@ task asm_nop;
     end
 endtask
 
+task asm_rcf;
+    begin
+        asm1('hCF);
+    end
+endtask
+
+task asm_scf;
+    begin
+        asm1('hDF);
+    end
+endtask
+
+task asm_ccf;
+    begin
+        asm1('hEF);
+    end
+endtask
+
 task asm_ld;
     input [3:0] dst;
     input [3:0] src;

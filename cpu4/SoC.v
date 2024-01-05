@@ -201,7 +201,7 @@ module Processor(
             end
             4'hF: begin
                 state <= STATE_FETCH_INSTR;
-                case (instrH)
+                casez (instrH)
                 4'h8: begin
                     $display("    di");
                     //TODO
@@ -218,13 +218,9 @@ module Processor(
                     $display("    iret");
                     //TODO
                 end
-                4'hC: begin
-                    $display("    rcf");
-                    flags[FLAG_INDEX_C] <= 0;
-                end
-                4'hD: begin
-                    $display("    scf");
-                    flags[FLAG_INDEX_C] <= 1;
+                4'b110?: begin
+                    $display("    %scf", instrH[0] ? "s" : "r");
+                    flags[FLAG_INDEX_C] <= instrH[0];
                 end
                 4'hE: begin
                     $display("    ccf");
