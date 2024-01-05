@@ -341,6 +341,37 @@ module Processor(
             $display("  %h %h %h", instruction, second, third);
             state <= STATE_FETCH_INSTR;
             case (instrL)
+                ALU8_ADD,
+                ALU8_ADC,
+                ALU8_SUB,
+                ALU8_SBC,
+                ALU8_OR,
+                ALU8_AND,
+                ALU8_TCM,
+                ALU8_TM,
+                ALU8_CP,
+                ALU8_XOR: begin
+                    $display("    %s %h, #%h",
+                                instrH == ALU8_ADD ? "add" :
+                                instrH == ALU8_ADC ? "adc" :
+                                instrH == ALU8_SUB ? "sub" :
+                                instrH == ALU8_SBC ? "sbc" :
+                                instrH == ALU8_OR  ? "or" :
+                                instrH == ALU8_AND ? "and" :
+                                instrH == ALU8_TCM ? "tcm" :
+                                instrH == ALU8_TM  ? "tm" :
+                                instrH == ALU8_CP  ? "cp" :
+                                instrH == ALU8_XOR ? "xor" : "?",
+                                second, third);
+                    writeRegister <= second;
+                    valueDst <= registers[secondL];
+                    valueSrc <= third;
+                    aluMode <= instrH;
+                    writeBackEn <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
+                                 | (instrH[3:1] == 3'b010)   // or, and
+                                 | (instrH      == 4'b1011); // xor
+                    writeFlags <= 1;
+                end
             4'hD: begin // jump
                 $display("    jmp %h, %h", instrH, directAddress);
                 if (jumpCondition) begin

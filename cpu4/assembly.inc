@@ -78,11 +78,19 @@ task asm_ldc;
     end
 endtask
 
-task asm_add;
+task asm_add_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
         asm2(8'h02, {dst, src});
+    end
+endtask
+
+task asm_add_R_IM;
+    input [7:0] dst;
+    input [7:0] src;
+    begin
+        asm3(8'h06, dst, src);
     end
 endtask
 
