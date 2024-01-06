@@ -8,6 +8,7 @@ cls
 ::call :simulate SoC
 call :test add
 call :test jp
+call :test jr
 call :test Xcf
 
 pause

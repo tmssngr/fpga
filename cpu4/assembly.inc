@@ -182,6 +182,13 @@ localparam JC_NOV = 12;
 localparam JC_PL = 13;
 localparam JC_NZ = 14;
 localparam JC_NC = 15;
+task asm_jr;
+	input [3:0] condition;
+    input [7:0] addr;
+    begin
+        asm2({ condition, 4'hB }, addr);
+    end
+endtask
 task asm_jp;
 	input [3:0] condition;
     input [15:0] addr;

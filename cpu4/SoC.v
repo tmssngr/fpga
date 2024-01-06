@@ -96,6 +96,7 @@ module Processor(
     reg  [7:0] instruction;
     wire [3:0] instrH = instruction[7:4];
     wire [3:0] instrL = instruction[3:0];
+    wire isJumpRel = instrL == 4'hB;
     wire isJumpDA = instrL == 4'hD;
     wire isInstrSize1 = (instrL[3:1] == 3'b111);
     wire isInstrSize3 = (instrL[3:2] == 2'b01)
@@ -203,17 +204,19 @@ module Processor(
                            || (isInstrSize2 && state == STATE_READ_2)
                            )
                            ? STATE_EXEC
-                           : (state == STATE_EXEC) 
-                                ? STATE_FETCH_INSTR 
+                           : (state == STATE_EXEC)
+                                ? STATE_FETCH_INSTR
                                 : state + 1;
 
     wire [7:0] nextPc = (  state == STATE_READ_INSTR
                          | state == STATE_READ_2
-                         | state == STATE_READ_3) 
-                         ? pc + 1 
+                         | state == STATE_READ_3)
+                         ? pc + 1
                          : ( state == STATE_EXEC & isJumpDA & takeBranch) 
-                            ? directAddress 
-                            : pc;
+                            ? directAddress
+                            : ( state == STATE_EXEC & isJumpRel & takeBranch) 
+                                ? pc + { {8{second[7]}}, second }
+                                : pc;
     assign memStrobe = (state == STATE_FETCH_INSTR)
                      | (state == STATE_WAIT_2 & ~isInstrSize1)
                      | (state == STATE_WAIT_3);
@@ -325,8 +328,7 @@ module Processor(
                 //TODO
             end
             4'hB: begin
-                $display("    jr %s, %h", ccName(instrH), secondL);
-                //TODO
+                $display("    jr %s, %h", ccName(instrH), second);
             end
             4'hC: begin
                 $display("    ld r%h, #%h", instrH, second);
