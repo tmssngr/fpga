@@ -96,9 +96,10 @@ module Processor(
     reg  [7:0] instruction;
     wire [3:0] instrH = instruction[7:4];
     wire [3:0] instrL = instruction[3:0];
+    wire isJumpDA = instrL == 4'hD;
     wire isInstrSize1 = (instrL[3:1] == 3'b111);
     wire isInstrSize3 = (instrL[3:2] == 2'b01)
-                      | (instrL == 4'hD);
+                      | isJumpDA;
 
     reg  [7:0] second;
     wire [3:0] secondH = second[7:4];
@@ -178,6 +179,14 @@ module Processor(
                            ? STATE_FETCH_INSTR 
                            : state + 1;
 
+    wire [7:0] nextPc = (  state == STATE_READ_INSTR
+                         | state == STATE_READ_2
+                         | state == STATE_READ_3) 
+                         ? pc + 1 
+                         : ( state == STATE_EXEC_3 & isJumpDA & takeBranch) 
+                            ? directAddress 
+                            : pc;
+
     always @(posedge clk) begin
         if (writeFlags) begin
             $display("    alu:    %h       %h    =>    %h", aluA, aluB, aluOut);
@@ -200,7 +209,6 @@ module Processor(
 
         STATE_READ_INSTR: begin
             instruction <= memDataRead;
-            pc <= pc + 1;
         end
 
         STATE_EXEC_1: begin
@@ -250,7 +258,6 @@ module Processor(
         STATE_READ_2: begin
             $display("%h: read 2nd byte", pc);
             second <= memDataRead;
-            pc <= pc + 1;
         end
 
         STATE_EXEC_2: begin
@@ -319,7 +326,6 @@ module Processor(
         STATE_READ_3: begin
             $display("%h: read 3rd byte", pc);
             third <= memDataRead;
-            pc <= pc + 1;
         end
 
         STATE_EXEC_3: begin
@@ -351,11 +357,8 @@ module Processor(
                 end
                 endcase
             end
-            4'hD: begin // jump
+            4'hD: begin
                 $display("    jmp %h, %h", instrH, directAddress);
-                if (takeBranch) begin
-                    pc <= directAddress;
-                end
             end
             default: begin
             end
@@ -365,6 +368,7 @@ module Processor(
         endcase
 
         state <= nextState;
+        pc <= nextPc;
     end
 
     assign memAddr = pc;
