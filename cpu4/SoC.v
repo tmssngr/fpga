@@ -166,6 +166,31 @@ module Processor(
     end
     wire takeBranch = regBranchTmp ^ instrH[3];
 
+    function [1:3*8] ccName( // maximum of 3 characters
+        input [3:0] instrH
+    );
+    begin
+        case (instrH)
+        0: ccName = "f";
+        1: ccName = "lt";
+        2: ccName = "le";
+        3: ccName = "ule";
+        4: ccName = "ov";
+        5: ccName = "mi";
+        6: ccName = "z";
+        7: ccName = "c";
+        8: ccName = "";
+        9: ccName = "ge";
+        10: ccName = "gt";
+        11: ccName = "ugt";
+        12: ccName = "nov";
+        13: ccName = "pl";
+        14: ccName = "nz";
+        15: ccName = "nc";
+        endcase
+    end
+    endfunction
+
     localparam STATE_FETCH_INSTR  = 0;
     localparam STATE_READ_INSTR   = 1;
     localparam STATE_WAIT_2       = 2;
@@ -300,7 +325,7 @@ module Processor(
                 //TODO
             end
             4'hB: begin
-                $display("    jr %h, %h", instrH, secondL);
+                $display("    jr %s, %h", ccName(instrH), secondL);
                 //TODO
             end
             4'hC: begin
@@ -311,7 +336,7 @@ module Processor(
                 writeRegister <= 1;
             end
             4'hD: begin
-                $display("    jmp %h, %h", instrH, directAddress);
+                $display("    jmp %s, %h", ccName(instrH), directAddress);
             end
             4'hE: begin
                 $display("    inc r%h", instrH);

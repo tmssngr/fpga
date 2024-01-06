@@ -6,7 +6,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   0d ff
 02: read 3rd byte
   0d ff fe
-    jmp 0, fffe
+    jmp   f, fffe
 
 03: read instruction
   0c
@@ -33,7 +33,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   ed 00
 0a: read 3rd byte
   ed 00 05
-    jmp e, 0005
+    jmp  nz, 0005
 
 05: read instruction
   06
@@ -53,7 +53,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   ed 00
 0a: read 3rd byte
   ed 00 05
-    jmp e, 0005
+    jmp  nz, 0005
 
 05: read instruction
   06
@@ -73,7 +73,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   ed 00
 0a: read 3rd byte
   ed 00 05
-    jmp e, 0005
+    jmp  nz, 0005
 
 0b: read instruction
   8d
@@ -81,7 +81,7 @@ VCD info: dumpfile SoC.vcd opened for output.
   8d 00
 0d: read 3rd byte
   8d 00 00
-    jmp 8, 0000
+    jmp    , 0000
 
 00: read instruction
 testSoC: SUCCESS
