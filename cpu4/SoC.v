@@ -80,29 +80,6 @@ module Alu8(
     end
 endmodule
 
-module JumpCondition(
-    input [3:0] jumpInstrH,
-    input [7:0] flags,
-    output reg  out
-);
-    `include "flags.vh"
-
-    reg tmp;
-    always @(*) begin
-        case (jumpInstrH[2:0])
-        3'b000: tmp = 0;
-        3'b001: tmp =  flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V];
-        3'b010: tmp = (flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V]) | flags[FLAG_INDEX_Z];
-        3'b011: tmp = flags[FLAG_INDEX_C] | flags[FLAG_INDEX_Z];
-        3'b100: tmp = flags[FLAG_INDEX_V];
-        3'b101: tmp = flags[FLAG_INDEX_S];
-        3'b110: tmp = flags[FLAG_INDEX_Z];
-        3'b111: tmp = flags[FLAG_INDEX_C];
-        endcase
-        out = tmp ^ jumpInstrH[3];
-    end
-endmodule
-
 module Processor(
     input        clk,
     output [7:0] memAddr,
@@ -172,12 +149,20 @@ module Processor(
     end
     endfunction
 
-    wire jumpCondition;
-    JumpCondition jc(
-        .jumpInstrH(instrH),
-        .flags(flags),
-        .out(jumpCondition)
-    );
+    reg regBranchTmp;
+    always @(*) begin
+        case (instrH[2:0])
+        0: regBranchTmp = 0;
+        1: regBranchTmp =  flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V];
+        2: regBranchTmp = (flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V]) | flags[FLAG_INDEX_Z];
+        3: regBranchTmp =  flags[FLAG_INDEX_C] | flags[FLAG_INDEX_Z];
+        4: regBranchTmp =  flags[FLAG_INDEX_V];
+        5: regBranchTmp =  flags[FLAG_INDEX_S];
+        6: regBranchTmp =  flags[FLAG_INDEX_Z];
+        7: regBranchTmp =  flags[FLAG_INDEX_C];
+        endcase
+    end
+    wire takeBranch = regBranchTmp ^ instrH[3];
 
     localparam STATE_FETCH_INSTR  = 0;
     localparam STATE_READ_INSTR   = 1;
@@ -376,7 +361,7 @@ module Processor(
             end
             4'hD: begin // jump
                 $display("    jmp %h, %h", instrH, directAddress);
-                if (jumpCondition) begin
+                if (takeBranch) begin
                     pc <= directAddress;
                 end
             end
