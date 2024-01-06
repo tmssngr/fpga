@@ -1,6 +1,7 @@
 module testSoC();
 
 `include "assert.v"
+`define assertPc(value) if (uut.proc.pc !== value) begin $display("ASSERTION FAILED in %m: pc(%h) != value", uut.proc.pc); $finish(2); end
 
     reg clk = 0;
 

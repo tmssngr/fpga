@@ -1,8 +1,8 @@
 // scf
     @(negedge clk);
-        `assert(uut.proc.pc, 0);
+        `assertPc(0);
     @(negedge clk);
-        `assert(uut.proc.pc, 1);
+        `assertPc(1);
         `assert(uut.proc.instruction, 'hDF);
     repeat (2) @(negedge clk);
         // c
@@ -37,6 +37,6 @@
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'h00);
     @(negedge clk);
-        `assert(uut.proc.pc, 0);
+        `assertPc(0);
 
     #3
