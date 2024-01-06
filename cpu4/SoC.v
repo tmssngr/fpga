@@ -100,6 +100,7 @@ module Processor(
     wire isInstrSize1 = (instrL[3:1] == 3'b111);
     wire isInstrSize3 = (instrL[3:2] == 2'b01)
                       | isJumpDA;
+    wire isInstrSize2 = ~isInstrSize1 & ~isInstrSize3;
 
     reg  [7:0] second;
     wire [3:0] secondH = second[7:4];
@@ -167,25 +168,30 @@ module Processor(
 
     localparam STATE_FETCH_INSTR  = 0;
     localparam STATE_READ_INSTR   = 1;
-    localparam STATE_EXEC_1       = 2;
+    localparam STATE_WAIT_2       = 2;
     localparam STATE_READ_2       = 3;
-    localparam STATE_EXEC_2       = 4;
+    localparam STATE_WAIT_3       = 4;
     localparam STATE_READ_3       = 5;
-    localparam STATE_EXEC_3       = 6;
+    localparam STATE_EXEC         = 6;
     reg [2:0] state = STATE_FETCH_INSTR;
-    wire [2:0] nextState =   ((state == STATE_EXEC_1) &  isInstrSize1)
-                           | ((state == STATE_EXEC_2) & ~isInstrSize3)
-                           |  (state == STATE_EXEC_3) 
-                           ? STATE_FETCH_INSTR 
-                           : state + 1;
+    wire [2:0] nextState = (  (isInstrSize1 && state == STATE_WAIT_2)
+                           || (isInstrSize2 && state == STATE_READ_2)
+                           )
+                           ? STATE_EXEC
+                           : (state == STATE_EXEC) 
+                                ? STATE_FETCH_INSTR 
+                                : state + 1;
 
     wire [7:0] nextPc = (  state == STATE_READ_INSTR
                          | state == STATE_READ_2
                          | state == STATE_READ_3) 
                          ? pc + 1 
-                         : ( state == STATE_EXEC_3 & isJumpDA & takeBranch) 
+                         : ( state == STATE_EXEC & isJumpDA & takeBranch) 
                             ? directAddress 
                             : pc;
+    assign memStrobe = (state == STATE_FETCH_INSTR)
+                     | (state == STATE_WAIT_2 & ~isInstrSize1)
+                     | (state == STATE_WAIT_3);
 
     always @(posedge clk) begin
         if (writeFlags) begin
@@ -211,9 +217,115 @@ module Processor(
             instruction <= memDataRead;
         end
 
-        STATE_EXEC_1: begin
+        STATE_WAIT_2: begin
             $display("  %h", instruction);
+        end
+
+        STATE_READ_2: begin
+            $display("%h: read 2nd byte", pc);
+            second <= memDataRead;
+        end
+
+        STATE_WAIT_3: begin
+            $display("  %h %h", instruction, second);
+        end
+
+        STATE_READ_3: begin
+            $display("%h: read 3rd byte", pc);
+            third <= memDataRead;
+        end
+
+        STATE_EXEC: begin
+            if (isInstrSize2) begin
+                $display("  %h %h", instruction, second);
+            end else if (isInstrSize3) begin
+                $display("  %h %h %h", instruction, second, third);
+            end
             case (instrL)
+            4'h2: begin
+                case (instrH)
+                ALU8_ADD,
+                ALU8_ADC,
+                ALU8_SUB,
+                ALU8_SBC,
+                ALU8_OR,
+                ALU8_AND,
+                ALU8_TCM,
+                ALU8_TM,
+                ALU8_CP,
+                ALU8_XOR: begin
+                    $display("    %s r%h, r%h",
+                                alu8OpName(instrH),
+                                secondH, secondL);
+                    dstRegister <= secondH;
+                    aluA <= registers[secondH];
+                    aluB <= registers[secondL];
+                    aluMode <= instrH;
+                    writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
+                                    | (instrH[3:1] == 3'b010)   // or, and
+                                    | (instrH      == 4'b1011); // xor
+                    writeFlags <= 1;
+                end
+                default: begin
+                    $display("    ?", instruction);
+                end
+                endcase
+            end
+            4'h6: begin
+                case (instrH)
+                ALU8_ADD,
+                ALU8_ADC,
+                ALU8_SUB,
+                ALU8_SBC,
+                ALU8_OR,
+                ALU8_AND,
+                ALU8_TCM,
+                ALU8_TM,
+                ALU8_CP,
+                ALU8_XOR: begin
+                    $display("    %s %h, #%h",
+                             alu8OpName(instrH),
+                             second, third);
+                    dstRegister <= second;
+                    aluA <= registers[secondL];
+                    aluB <= third;
+                    aluMode <= instrH;
+                    writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
+                                   | (instrH[3:1] == 3'b010)   // or, and
+                                   | (instrH      == 4'b1011); // xor
+                    writeFlags <= 1;
+                end
+                endcase
+            end
+            4'h8: begin
+                $display("    ld r%h, %h", instrH, secondL);
+                dstRegister <= instrH;
+                aluB <= registers[secondL];
+                aluMode <= ALU8_LD;
+                writeRegister <= 1;
+            end
+            4'h9: begin
+                $display("    ld %h, r%h", secondL, instrH);
+                //TODO
+            end
+            4'hA: begin
+                $display("    djnz r%h, %h", instrH, secondL);
+                //TODO
+            end
+            4'hB: begin
+                $display("    jr %h, %h", instrH, secondL);
+                //TODO
+            end
+            4'hC: begin
+                $display("    ld r%h, #%h", instrH, second);
+                dstRegister <= instrH;
+                aluA <= second;
+                aluMode <= ALU8_LD;
+                writeRegister <= 1;
+            end
+            4'hD: begin
+                $display("    jmp %h, %h", instrH, directAddress);
+            end
             4'hE: begin
                 $display("    inc r%h", instrH);
                 //TODO
@@ -252,114 +364,6 @@ module Processor(
                 end
                 endcase
             end
-            endcase
-        end
-
-        STATE_READ_2: begin
-            $display("%h: read 2nd byte", pc);
-            second <= memDataRead;
-        end
-
-        STATE_EXEC_2: begin
-            $display("  %h %h", instruction, second);
-            if (~isInstrSize3) begin
-                case (instrL)
-                4'h2: begin
-                    case (instrH)
-                    ALU8_ADD,
-                    ALU8_ADC,
-                    ALU8_SUB,
-                    ALU8_SBC,
-                    ALU8_OR,
-                    ALU8_AND,
-                    ALU8_TCM,
-                    ALU8_TM,
-                    ALU8_CP,
-                    ALU8_XOR: begin
-                        $display("    %s r%h, r%h",
-                                 alu8OpName(instrH),
-                                 secondH, secondL);
-                        dstRegister <= secondH;
-                        aluA <= registers[secondH];
-                        aluB <= registers[secondL];
-                        aluMode <= instrH;
-                        writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
-                                       | (instrH[3:1] == 3'b010)   // or, and
-                                       | (instrH      == 4'b1011); // xor
-                        writeFlags <= 1;
-                    end
-                    default: begin
-                        $display("    ?", instruction);
-                    end
-                    endcase
-                end
-                4'h8: begin
-                    $display("    ld r%h, %h", instrH, secondL);
-                    dstRegister <= instrH;
-                    aluB <= registers[secondL];
-                    aluMode <= ALU8_LD;
-                    writeRegister <= 1;
-                end
-                4'h9: begin
-                    $display("    ld %h, r%h", secondL, instrH);
-                    //TODO
-                end
-                4'hA: begin
-                    $display("    djnz r%h, %h", instrH, secondL);
-                    //TODO
-                end
-                4'hB: begin
-                    $display("    jr %h, %h", instrH, secondL);
-                    //TODO
-                end
-                4'hC: begin
-                    $display("    ld r%h, #%h", instrH, second);
-                    dstRegister <= instrH;
-                    aluA <= second;
-                    aluMode <= ALU8_LD;
-                    writeRegister <= 1;
-                end
-                endcase
-            end
-        end
-
-        STATE_READ_3: begin
-            $display("%h: read 3rd byte", pc);
-            third <= memDataRead;
-        end
-
-        STATE_EXEC_3: begin
-            $display("  %h %h %h", instruction, second, third);
-            case (instrL)
-            4'h6: begin
-                case (instrH)
-                ALU8_ADD,
-                ALU8_ADC,
-                ALU8_SUB,
-                ALU8_SBC,
-                ALU8_OR,
-                ALU8_AND,
-                ALU8_TCM,
-                ALU8_TM,
-                ALU8_CP,
-                ALU8_XOR: begin
-                    $display("    %s %h, #%h",
-                             alu8OpName(instrH),
-                             second, third);
-                    dstRegister <= second;
-                    aluA <= registers[secondL];
-                    aluB <= third;
-                    aluMode <= instrH;
-                    writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
-                                   | (instrH[3:1] == 3'b010)   // or, and
-                                   | (instrH      == 4'b1011); // xor
-                    writeFlags <= 1;
-                end
-                endcase
-            end
-            4'hD: begin
-                $display("    jmp %h, %h", instrH, directAddress);
-            end
             default: begin
             end
             endcase
@@ -372,9 +376,6 @@ module Processor(
     end
 
     assign memAddr = pc;
-    assign memStrobe = (state == STATE_FETCH_INSTR)
-                     | (state == STATE_EXEC_1 & ~isInstrSize1)
-                     | (state == STATE_EXEC_2 & isInstrSize3);
 endmodule
 
 module SoC(
