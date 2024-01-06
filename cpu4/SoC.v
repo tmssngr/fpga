@@ -154,6 +154,24 @@ module Processor(
         .outFlags(flagsOut)
     );
 
+    function [1:3*8] alu8OpName( // maximum of 3 characters
+        input [3:0] instrH
+    );
+    begin
+        alu8OpName = instrH == ALU8_ADD ? "add" :
+                     instrH == ALU8_ADC ? "adc" :
+                     instrH == ALU8_SUB ? "sub" :
+                     instrH == ALU8_SBC ? "sbc" :
+                     instrH == ALU8_OR  ? "or"  :
+                     instrH == ALU8_AND ? "and" :
+                     instrH == ALU8_TCM ? "tcm" :
+                     instrH == ALU8_TM  ? "tm"  :
+                     instrH == ALU8_CP  ? "cp"  :
+                     instrH == ALU8_XOR ? "xor" :
+                     "?";
+    end
+    endfunction
+
     wire jumpCondition;
     JumpCondition jc(
         .jumpInstrH(instrH),
@@ -273,16 +291,7 @@ module Processor(
                     ALU8_CP,
                     ALU8_XOR: begin
                         $display("    %s r%h, r%h",
-                                 instrH == ALU8_ADD ? "add" :
-                                 instrH == ALU8_ADC ? "adc" :
-                                 instrH == ALU8_SUB ? "sub" :
-                                 instrH == ALU8_SBC ? "sbc" :
-                                 instrH == ALU8_OR  ? "or" :
-                                 instrH == ALU8_AND ? "and" :
-                                 instrH == ALU8_TCM ? "tcm" :
-                                 instrH == ALU8_TM  ? "tm" :
-                                 instrH == ALU8_CP  ? "cp" :
-                                 instrH == ALU8_XOR ? "xor" : "?",
+                                 alu8OpName(instrH),
                                  secondH, secondL);
                         dstRegister <= secondH;
                         aluA <= registers[secondH];
@@ -350,17 +359,8 @@ module Processor(
                 ALU8_CP,
                 ALU8_XOR: begin
                     $display("    %s %h, #%h",
-                                instrH == ALU8_ADD ? "add" :
-                                instrH == ALU8_ADC ? "adc" :
-                                instrH == ALU8_SUB ? "sub" :
-                                instrH == ALU8_SBC ? "sbc" :
-                                instrH == ALU8_OR  ? "or" :
-                                instrH == ALU8_AND ? "and" :
-                                instrH == ALU8_TCM ? "tcm" :
-                                instrH == ALU8_TM  ? "tm" :
-                                instrH == ALU8_CP  ? "cp" :
-                                instrH == ALU8_XOR ? "xor" : "?",
-                                second, third);
+                             alu8OpName(instrH),
+                             second, third);
                     dstRegister <= second;
                     aluA <= registers[secondL];
                     aluB <= third;
