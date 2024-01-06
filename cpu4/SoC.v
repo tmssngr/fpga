@@ -242,35 +242,7 @@ module Processor(
                 $display("  %h %h %h", instruction, second, third);
             end
             case (instrL)
-            4'h2: begin
-                case (instrH)
-                ALU8_ADD,
-                ALU8_ADC,
-                ALU8_SUB,
-                ALU8_SBC,
-                ALU8_OR,
-                ALU8_AND,
-                ALU8_TCM,
-                ALU8_TM,
-                ALU8_CP,
-                ALU8_XOR: begin
-                    $display("    %s r%h, r%h",
-                                alu8OpName(instrH),
-                                secondH, secondL);
-                    dstRegister <= secondH;
-                    aluA <= registers[secondH];
-                    aluB <= registers[secondL];
-                    aluMode <= instrH;
-                    writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
-                                    | (instrH[3:1] == 3'b010)   // or, and
-                                    | (instrH      == 4'b1011); // xor
-                    writeFlags <= 1;
-                end
-                default: begin
-                    $display("    ?", instruction);
-                end
-                endcase
-            end
+            4'h2,
             4'h6: begin
                 case (instrH)
                 ALU8_ADD,
@@ -283,17 +255,32 @@ module Processor(
                 ALU8_TM,
                 ALU8_CP,
                 ALU8_XOR: begin
-                    $display("    %s %h, #%h",
-                             alu8OpName(instrH),
-                             second, third);
-                    dstRegister <= second;
-                    aluA <= registers[secondL];
-                    aluB <= third;
                     aluMode <= instrH;
-                    writeRegister <= (instrH[3:2] == 2'b00)    // add, adc, sub, sbc
-                                   | (instrH[3:1] == 3'b010)   // or, and
-                                   | (instrH      == 4'b1011); // xor
+                    writeRegister <= (instrH[3:2] == 2'b00)     // add, adc, sub, sbc
+                                    | (instrH[3:1] == 3'b010)   // or, and
+                                    | (instrH      == 4'b1011); // xor
                     writeFlags <= 1;
+                    case (instrL)
+                    4'h2: begin
+                        $display("    %s r%h, r%h",
+                                    alu8OpName(instrH),
+                                    secondH, secondL);
+                        dstRegister <= secondH;
+                        aluA <= registers[secondH];
+                        aluB <= registers[secondL];
+                    end
+                    4'h6: begin
+                        $display("    %s %h, #%h",
+                                alu8OpName(instrH),
+                                second, third);
+                        dstRegister <= second;
+                        aluA <= registers[secondL];
+                        aluB <= third;
+                    end
+                    endcase
+                end
+                default: begin
+                    $display("    ?", instruction);
                 end
                 endcase
             end
