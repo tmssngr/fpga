@@ -348,6 +348,8 @@ module Processor(
             $display("  %h %h %h", instruction, second, third);
             state <= STATE_FETCH_INSTR;
             case (instrL)
+            4'h6: begin
+                case (instrH)
                 ALU8_ADD,
                 ALU8_ADC,
                 ALU8_SUB,
@@ -370,6 +372,8 @@ module Processor(
                                    | (instrH      == 4'b1011); // xor
                     writeFlags <= 1;
                 end
+                endcase
+            end
             4'hD: begin // jump
                 $display("    jmp %h, %h", instrH, directAddress);
                 if (jumpCondition) begin
