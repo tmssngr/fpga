@@ -172,6 +172,11 @@ module Processor(
     localparam STATE_READ_3       = 5;
     localparam STATE_EXEC_3       = 6;
     reg [2:0] state = STATE_FETCH_INSTR;
+    wire [2:0] nextState =   ((state == STATE_EXEC_1) &  isInstrSize1)
+                           | ((state == STATE_EXEC_2) & ~isInstrSize3)
+                           |  (state == STATE_EXEC_3) 
+                           ? STATE_FETCH_INSTR 
+                           : state + 1;
 
     always @(posedge clk) begin
         if (writeFlags) begin
@@ -191,13 +196,11 @@ module Processor(
         case (state)
         STATE_FETCH_INSTR: begin
             $display("\n%h: read instruction", pc);
-            state <= state + 1;
         end
 
         STATE_READ_INSTR: begin
             instruction <= memDataRead;
             pc <= pc + 1;
-            state <= state + 1;
         end
 
         STATE_EXEC_1: begin
@@ -208,7 +211,6 @@ module Processor(
                 //TODO
             end
             4'hF: begin
-                state <= STATE_FETCH_INSTR;
                 casez (instrH)
                 4'h8: begin
                     $display("    di");
@@ -242,9 +244,6 @@ module Processor(
                 end
                 endcase
             end
-            default: begin
-                state <= state + 1;
-            end
             endcase
         end
 
@@ -252,16 +251,11 @@ module Processor(
             $display("%h: read 2nd byte", pc);
             second <= memDataRead;
             pc <= pc + 1;
-            state <= state + 1;
         end
 
         STATE_EXEC_2: begin
             $display("  %h %h", instruction, second);
-            if (isInstrSize3) begin
-                state <= state + 1;
-            end
-            else begin
-                state <= STATE_FETCH_INSTR;
+            if (~isInstrSize3) begin
                 case (instrL)
                 4'h2: begin
                     case (instrH)
@@ -326,12 +320,10 @@ module Processor(
             $display("%h: read 3rd byte", pc);
             third <= memDataRead;
             pc <= pc + 1;
-            state <= state + 1;
         end
 
         STATE_EXEC_3: begin
             $display("  %h %h %h", instruction, second, third);
-            state <= STATE_FETCH_INSTR;
             case (instrL)
             4'h6: begin
                 case (instrH)
@@ -371,6 +363,8 @@ module Processor(
         end
 
         endcase
+
+        state <= nextState;
     end
 
     assign memAddr = pc;
