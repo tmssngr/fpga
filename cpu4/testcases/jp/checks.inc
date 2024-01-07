@@ -3,7 +3,7 @@
         `assertPc(0);
     @(negedge clk);
         `assertPc(1);
-        `assert(uut.proc.instruction, 'h0D);
+        `assertInstr('h0D);
     repeat (2) @(negedge clk);
         `assertPc(2);
         `assert(uut.proc.second, 'hFF);
@@ -14,7 +14,7 @@
 // ld r0, #3
     repeat (3) @(negedge clk);
         `assertPc(4);
-        `assert(uut.proc.instruction, 'h0C);
+        `assertInstr('h0C);
     repeat (2) @(negedge clk);
         `assertPc(5);
         `assert(uut.proc.second, 'h03);
@@ -24,7 +24,7 @@
 // 5: add r0, r1
         `assertPc(6);
     repeat (4) @(negedge clk);
-        `assert(uut.proc.instruction, 'h06);
+        `assertInstr('h06);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'hFF);
     repeat (3) @(negedge clk);
@@ -34,7 +34,7 @@
 
 // jp nz, 5
     repeat (4) @(negedge clk);
-        `assert(uut.proc.instruction, 'hED);
+        `assertInstr('hED);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'h05);
     repeat (1) @(negedge clk);
@@ -42,7 +42,7 @@
 // 5: add r0, r1
         `assertPc(5);
     repeat (6) @(negedge clk);
-        `assert(uut.proc.instruction, 'h06);
+        `assertInstr('h06);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'hFF);
     repeat (2) @(negedge clk);
@@ -52,7 +52,7 @@
 
 // jp nz, 5
     repeat (5) @(negedge clk);
-        `assert(uut.proc.instruction, 'hED);
+        `assertInstr('hED);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'h05);
     repeat (1) @(negedge clk);
@@ -60,7 +60,7 @@
 // 5: add r0, r1
         `assertPc(5);
     repeat (6) @(negedge clk);
-        `assert(uut.proc.instruction, 'h06);
+        `assertInstr('h06);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'hFF);
     repeat (2) @(negedge clk);
@@ -70,14 +70,14 @@
 
 // jp nz, 5
     repeat (5) @(negedge clk);
-        `assert(uut.proc.instruction, 'hED);
+        `assertInstr('hED);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'h05);
 
 // jmp 0
         `assertPc(11);
     repeat (7) @(negedge clk);
-        `assert(uut.proc.instruction, 'h8D);
+        `assertInstr('h8D);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'h00);
     @(negedge clk);

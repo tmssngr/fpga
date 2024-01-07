@@ -3,7 +3,7 @@
         `assertPc(0);
     @(negedge clk);
         `assertPc(1);
-        `assert(uut.proc.instruction, 'h0C);
+        `assertInstr('h0C);
     repeat (2) @(negedge clk);
         `assertPc(2);
         `assert(uut.proc.second, 'h09);
@@ -12,7 +12,7 @@
 
 // ld r1, #1
         `assertPc(3);
-        `assert(uut.proc.instruction, 'h1C);
+        `assertInstr('h1C);
     repeat (2) @(negedge clk);
         `assertPc(4);
         `assert(uut.proc.second, 'h01);
@@ -21,7 +21,7 @@
 
 // add r0, r1
         `assertPc(5);
-        `assert(uut.proc.instruction, 'h02);
+        `assertInstr('h02);
     repeat (2) @(negedge clk);
         `assertPc(6);
         `assert(uut.proc.second, 'h01);
@@ -32,7 +32,7 @@
 
 // ld r1, #6
         `assertPc(7);
-        `assert(uut.proc.instruction, 'h1C);
+        `assertInstr('h1C);
     repeat (2) @(negedge clk);
         `assertPc(8);
         `assert(uut.proc.second, 'h06);
@@ -41,7 +41,7 @@
 
 // add r0, r1
         `assertPc(9);
-        `assert(uut.proc.instruction, 'h02);
+        `assertInstr('h02);
     repeat (2) @(negedge clk);
         `assertPc(10);
         `assert(uut.proc.second, 'h01);
@@ -57,7 +57,7 @@
 
 // add r0, r1
     repeat (2) @(negedge clk);
-        `assert(uut.proc.instruction, 'h02);
+        `assertInstr('h02);
         `assert(uut.proc.second,      'h01);
     repeat (3) @(negedge clk);
         `assert(uut.proc.registers[0], 'h90);
@@ -70,7 +70,7 @@
 
 // add r0, r1
     repeat (2) @(negedge clk);
-        `assert(uut.proc.instruction, 'h02);
+        `assertInstr('h02);
         `assert(uut.proc.second,      'h01);
     repeat (3) @(negedge clk);
         `assert(uut.proc.registers[0], 'h00);
@@ -94,7 +94,7 @@
 
 // jmp 0
     repeat (4) @(negedge clk);
-        `assert(uut.proc.instruction, 'h8D);
+        `assertInstr('h8D);
         `assert(uut.proc.second,      'h00);
         `assert(uut.proc.third,       'h00);
     repeat (2) @(negedge clk);
