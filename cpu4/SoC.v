@@ -317,16 +317,16 @@ module Processor(
     localparam STATE_READ_2       = 3;
     localparam STATE_WAIT_3       = 4;
     localparam STATE_READ_3       = 5;
-    localparam STATE_EXEC         = 6;
+    localparam STATE_DECODE       = 6;
     reg [2:0] state = STATE_FETCH_INSTR;
 
     wire [7:0] nextPc = (  state == STATE_READ_INSTR
                          | state == STATE_READ_2
                          | state == STATE_READ_3)
                          ? pc + 1
-                         : ( state == STATE_EXEC & isJumpDA & takeBranch) 
+                         : ( state == STATE_DECODE & isJumpDA & takeBranch) 
                             ? directAddress
-                            : ( state == STATE_EXEC & isJumpRel & takeBranch) 
+                            : ( state == STATE_DECODE & isJumpRel & takeBranch) 
                                 ? pc + { {8{second[7]}}, second }
                                 : pc;
     assign memStrobe = (state == STATE_FETCH_INSTR)
@@ -366,7 +366,7 @@ module Processor(
         STATE_WAIT_2: begin
             $display("  %h", instruction);
             if (isInstrSize1) begin
-                state <= STATE_EXEC;
+                state <= STATE_DECODE;
             end
         end
 
@@ -374,7 +374,7 @@ module Processor(
             $display("%h: read 2nd byte", pc);
             second <= memDataRead;
             if (isInstrSize2) begin
-                state <= STATE_EXEC;
+                state <= STATE_DECODE;
             end
         end
 
@@ -387,7 +387,7 @@ module Processor(
             third <= memDataRead;
         end
 
-        STATE_EXEC: begin
+        STATE_DECODE: begin
             if (isInstrSize2) begin
                 $display("  %h %h", instruction, second);
             end else if (isInstrSize3) begin
