@@ -471,6 +471,13 @@ module Processor(
                     end
                     endcase
                 end
+                4'hE: begin
+                    $display("    ld %h, #%h", second, third);
+                    dstRegister <= r8(second);
+                    aluA <= third;
+                    aluMode <= ALU1_LD;
+                    writeRegister <= 1;
+                end
                 default: begin
                     $display("    ?", instruction);
                 end
