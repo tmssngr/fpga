@@ -168,8 +168,8 @@ module Processor(
     reg writeRegister = 0;
 
     `include "alu.vh"
-    reg  [7:0] aluA;
-    reg  [7:0] aluB;
+    reg  [7:0] aluA = 0;
+    reg  [7:0] aluB = 0;
     reg  [4:0] aluMode;
     wire [7:0] aluOut;
     reg  [7:0] flags = 0;
@@ -238,11 +238,19 @@ module Processor(
         endcase;
     end
     endfunction
+
+    function [4:0] alu1OpCode(
+        input[3:0] instrH
+    );
+        alu1OpCode = { 1'b0, instrH };
+    endfunction
+
     function [4:0] alu2OpCode(
         input[3:0] instrH
     );
         alu2OpCode = { 1'b1, instrH };
     endfunction
+
     function [1:3*8] alu2OpName( // maximum of 3 characters
         input [3:0] instrH
     );
@@ -408,8 +416,13 @@ module Processor(
                     //TODO
                 end
                 default: begin
-                    $display("    %s %h", 
+                    $display("   %s %h", 
                              alu1OpName(instrH), second);
+                    aluMode <= alu1OpCode(instrH);
+                    writeRegister <= 1;
+                    writeFlags <= 1;
+                    dstRegister <= r8(second);
+                    aluA <= readRegister8(second);
                 end
                 endcase
             end

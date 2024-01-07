@@ -10,6 +10,7 @@ call :test add
 call :test jp
 call :test jr
 call :test Xcf
+call :test inc
 
 pause
 goto :repeat

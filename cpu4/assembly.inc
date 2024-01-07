@@ -196,3 +196,82 @@ task asm_jp;
         asm3({ condition, 4'hD }, addr[15:8], addr[7:0]);
     end
 endtask
+
+task asm_dec;
+    input [7:0] dst;
+    begin
+        asm2(8'h00, dst);
+    end
+endtask
+task asm_rlc;
+    input [7:0] dst;
+    begin
+        asm2(8'h10, dst);
+    end
+endtask
+task asm_inc;
+    input [7:0] dst;
+    begin
+        asm2(8'h20, dst);
+    end
+endtask
+task asm_da;
+    input [7:0] dst;
+    begin
+        asm2(8'h40, dst);
+    end
+endtask
+task asm_com;
+    input [7:0] dst;
+    begin
+        asm2(8'h60, dst);
+    end
+endtask
+task asm_decw;
+    input [7:0] dst;
+    begin
+        asm2(8'h80, dst);
+    end
+endtask
+task asm_rl;
+    input [7:0] dst;
+    begin
+        asm2(8'h90, dst);
+    end
+endtask
+task asm_incw;
+    input [7:0] dst;
+    begin
+        asm2(8'hA0, dst);
+    end
+endtask
+task asm_clr;
+    input [7:0] dst;
+    begin
+        asm2(8'hB0, dst);
+    end
+endtask
+task asm_rrc;
+    input [7:0] dst;
+    begin
+        asm2(8'hC0, dst);
+    end
+endtask
+task asm_sra;
+    input [7:0] dst;
+    begin
+        asm2(8'hD0, dst);
+    end
+endtask
+task asm_rr;
+    input [7:0] dst;
+    begin
+        asm2(8'hE0, dst);
+    end
+endtask
+task asm_swap;
+    input [7:0] dst;
+    begin
+        asm2(8'hF0, dst);
+    end
+endtask
