@@ -319,13 +319,6 @@ module Processor(
     localparam STATE_READ_3       = 5;
     localparam STATE_EXEC         = 6;
     reg [2:0] state = STATE_FETCH_INSTR;
-    wire [2:0] nextState = (  (isInstrSize1 && state == STATE_WAIT_2)
-                           || (isInstrSize2 && state == STATE_READ_2)
-                           )
-                           ? STATE_EXEC
-                           : (state == STATE_EXEC)
-                                ? STATE_FETCH_INSTR
-                                : state + 1;
 
     wire [7:0] nextPc = (  state == STATE_READ_INSTR
                          | state == STATE_READ_2
@@ -359,6 +352,8 @@ module Processor(
         end
         writeRegister <= 0;
 
+        state <= state + 1;
+
         case (state)
         STATE_FETCH_INSTR: begin
             $display("\n%h: read instruction", pc);
@@ -370,11 +365,17 @@ module Processor(
 
         STATE_WAIT_2: begin
             $display("  %h", instruction);
+            if (isInstrSize1) begin
+                state <= STATE_EXEC;
+            end
         end
 
         STATE_READ_2: begin
             $display("%h: read 2nd byte", pc);
             second <= memDataRead;
+            if (isInstrSize2) begin
+                state <= STATE_EXEC;
+            end
         end
 
         STATE_WAIT_3: begin
@@ -392,6 +393,9 @@ module Processor(
             end else if (isInstrSize3) begin
                 $display("  %h %h %h", instruction, second, third);
             end
+
+            state <= STATE_FETCH_INSTR;
+
             case (instrL)
             4'h0: begin
                 case (instrH)
@@ -545,7 +549,6 @@ module Processor(
 
         endcase
 
-        state <= nextState;
         pc <= nextPc;
     end
 
