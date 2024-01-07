@@ -164,7 +164,7 @@ module Processor(
     reg [3:0] rp = 0;
     reg [7:0] registers[0:'h7F];
 
-    reg [3:0] dstRegister;
+    reg [7:0] dstRegister;
     reg writeRegister = 0;
 
     `include "alu.vh"

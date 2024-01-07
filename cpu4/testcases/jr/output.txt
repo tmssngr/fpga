@@ -11,7 +11,7 @@ VCD info: dumpfile SoC.vcd opened for output.
 03: read 2nd byte
   0c 03
     ld r0, #03
-    reg[0] = 03
+    reg[00] = 03
 
 04: read instruction
   06
@@ -23,7 +23,7 @@ VCD info: dumpfile SoC.vcd opened for output.
     alu:    03       ff    =>    02
          00000011 11111111 => 00000010
     flags = 1000_0100
-    reg[0] = 02
+    reg[00] = 02
 
 07: read instruction
   eb
@@ -41,7 +41,7 @@ VCD info: dumpfile SoC.vcd opened for output.
     alu:    02       ff    =>    01
          00000010 11111111 => 00000001
     flags = 1000_0100
-    reg[0] = 01
+    reg[00] = 01
 
 07: read instruction
   eb
@@ -59,7 +59,7 @@ VCD info: dumpfile SoC.vcd opened for output.
     alu:    01       ff    =>    00
          00000001 11111111 => 00000000
     flags = 1100_0100
-    reg[0] = 00
+    reg[00] = 00
 
 07: read instruction
   eb
