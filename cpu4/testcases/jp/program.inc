@@ -4,7 +4,7 @@ initial begin
     label(L0_);
       asm_jp(JC_NEVER, 16'hFFFE); // 0D FF FE
 
-      asm_ldc(0, 3);
+      asm_ld_r_IM(0, 3);
 
     label(L1_);
       asm_add_R_IM(0, 8'hFF);

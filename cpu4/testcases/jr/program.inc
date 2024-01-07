@@ -2,7 +2,7 @@ initial begin
 // L0:
       asm_jr(JC_NEVER, 8'hFE); // 0B ..
 
-      asm_ldc(0, 3);
+      asm_ld_r_IM(0, 3);
 
 // L1:
       asm_add_R_IM(0, 8'hFF);

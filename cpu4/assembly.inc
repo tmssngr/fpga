@@ -70,7 +70,7 @@ task asm_ld;
     end
 endtask
 
-task asm_ldc;
+task asm_ld_r_IM;
     input [3:0] dst;
     input [7:0] src;
     begin
