@@ -112,7 +112,8 @@ module Processor(
     wire [3:0] thirdL = third[3:0];
     wire [15:0] directAddress = {second, third};
 
-    reg [7:0] registers[0:15];
+    reg [3:0] rp = 0;
+    reg [7:0] registers[0:'h7F];
 
     reg [3:0] dstRegister;
     reg writeRegister = 0;
@@ -133,6 +134,38 @@ module Processor(
         .out(aluOut),
         .outFlags(flagsOut)
     );
+
+    function [7:0] r4(
+        input [3:0] r
+    );
+        r4 = { rp, r };
+    endfunction
+
+    function [7:0] r8(
+        input [7:0] r
+    );
+        if (r[7:4] == 4'hE)
+            r8 = r4(r[3:0]);
+        else
+            r8 = r;
+    endfunction
+
+    function [7:0] readRegister8(
+        input [7:0] r
+    );
+        casez (r)
+        8'b0???_????: readRegister8 = registers[r[6:0]];
+        8'hFC:        readRegister8 = flags;
+        8'hFD:        readRegister8 = { rp, 4'h0 };
+        default:      readRegister8 = 0;
+        endcase
+    endfunction
+
+    function [7:0] readRegister4(
+        input [3:0] r
+    );
+        readRegister4 = readRegister8(r4(r));
+    endfunction
 
     function [1:3*8] alu8OpName( // maximum of 3 characters
         input [3:0] instrH
@@ -232,7 +265,11 @@ module Processor(
 
         if (writeRegister) begin
             $display("    reg[%h] = %h", dstRegister, aluOut);
-            registers[dstRegister] <= aluOut;
+            casez (dstRegister)
+            8'b0???_????: registers[dstRegister] <= aluOut;
+            8'hFC:        flags                  <= aluOut;
+            8'hFD:        rp                     <= aluOut[7:4];
+            endcase
         end
         writeRegister <= 0;
 
@@ -270,6 +307,10 @@ module Processor(
                 $display("  %h %h %h", instruction, second, third);
             end
             case (instrL)
+            4'h1: begin
+                $display("    srp %h", second);
+                rp <= second[7:4];
+            end
             4'h2,
             4'h6: begin
                 case (instrH)
@@ -293,16 +334,16 @@ module Processor(
                         $display("    %s r%h, r%h",
                                     alu8OpName(instrH),
                                     secondH, secondL);
-                        dstRegister <= secondH;
-                        aluA <= registers[secondH];
-                        aluB <= registers[secondL];
+                        dstRegister <= r4(secondH);
+                        aluA <= readRegister4(secondH);
+                        aluB <= readRegister4(secondL);
                     end
                     4'h6: begin
                         $display("    %s %h, #%h",
                                 alu8OpName(instrH),
                                 second, third);
-                        dstRegister <= second;
-                        aluA <= registers[secondL];
+                        dstRegister <= r8(second);
+                        aluA <= readRegister8(r8(second));
                         aluB <= third;
                     end
                     endcase
@@ -314,8 +355,8 @@ module Processor(
             end
             4'h8: begin
                 $display("    ld r%h, %h", instrH, secondL);
-                dstRegister <= instrH;
-                aluB <= registers[secondL];
+                dstRegister <= r4(instrH);
+                aluB <= readRegister8(r8(second));
                 aluMode <= ALU8_LD;
                 writeRegister <= 1;
             end
@@ -332,7 +373,7 @@ module Processor(
             end
             4'hC: begin
                 $display("    ld r%h, #%h", instrH, second);
-                dstRegister <= instrH;
+                dstRegister <= r4(instrH);
                 aluA <= second;
                 aluMode <= ALU8_LD;
                 writeRegister <= 1;
