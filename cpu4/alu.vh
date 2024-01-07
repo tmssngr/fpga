@@ -1,17 +1,37 @@
 // similar to the upper nibble of the commands
-localparam ALU8_ADD = 4'b0000;
-localparam ALU8_ADC = 4'b0001;
-localparam ALU8_SUB = 4'b0010;
-localparam ALU8_SBC = 4'b0011;
-localparam ALU8_OR  = 4'b0100;
-localparam ALU8_AND = 4'b0101;
-localparam ALU8_TCM = 4'b0110;
-localparam ALU8_TM  = 4'b0111;
+localparam ALU1_DEC = 5'h00;
+localparam ALU1_RLC = 5'h01;
+localparam ALU1_INC = 5'h02;
+// 3 (fake)
+localparam ALU1_LD  = 5'h03;
+
+localparam ALU1_DA  = 5'h04;
+// 5
+localparam ALU1_COM = 5'h06;
+// 7
+localparam ALU1_DECW = 5'h08;
+localparam ALU1_RL   = 5'h09;
+localparam ALU1_INCW = 5'h0A;
+localparam ALU1_CLR  = 5'h0B;
+localparam ALU1_RRC  = 5'h0C;
+localparam ALU1_SRA  = 5'h0D;
+localparam ALU1_RR   = 5'h0E;
+localparam ALU1_SWAP = 5'h0F;
+
+
+localparam ALU2_ADD = 5'h10;
+localparam ALU2_ADC = 5'h11;
+localparam ALU2_SUB = 5'h12;
+localparam ALU2_SBC = 5'h13;
+localparam ALU2_OR  = 5'h14;
+localparam ALU2_AND = 5'h15;
+localparam ALU2_TCM = 5'h16;
+localparam ALU2_TM  = 5'h17;
 // 8
 // 9
-localparam ALU8_CP  = 4'b1010;
-localparam ALU8_XOR = 4'b1011;
+localparam ALU2_CP  = 5'h1A;
+localparam ALU2_XOR = 5'h1B;
 // c
 // d
 // e
-localparam ALU8_LD  = 4'b1111;
+// f

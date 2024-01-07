@@ -19,8 +19,8 @@ module Memory(
 endmodule
 
 // see https://github.com/Time0o/z80-verilog/blob/master/source/rtl/alu.v
-module Alu8(
-    input [3:0] mode,
+module Alu(
+    input [4:0] mode,
     input [7:0] a,
     input [7:0] b,
     input [7:0] flags,
@@ -37,8 +37,55 @@ module Alu8(
         outFlags = flags;
 
         case (mode)
-        ALU8_ADD,
-        ALU8_ADC: begin
+        ALU1_DEC: begin
+            out = a - 8'b01;
+            outFlags[FLAG_INDEX_V] = a[7] != out[7];
+        end
+        ALU1_RLC: begin
+            out = { a[6:0], flags[FLAG_INDEX_C] };
+            outFlags[FLAG_INDEX_C] = a[7];
+        end
+        ALU1_INC: begin
+            out = a + 8'b01;
+            outFlags[FLAG_INDEX_V] = a[7] != out[7];
+        end
+        ALU1_DA: begin
+            //TODO
+        end
+        ALU1_COM: begin
+            out = ~a;
+            outFlags[FLAG_INDEX_V] = 0;
+        end
+        ALU1_DECW: begin
+            //TODO
+        end
+        ALU1_RL: begin
+            out = { a[6:0], a[7] };
+            outFlags[FLAG_INDEX_C] = a[7];
+        end
+        ALU1_INCW: begin
+            //TODO
+        end
+        ALU1_CLR: begin
+            out = 0;
+        end
+        ALU1_RRC: begin
+            out = { flags[FLAG_INDEX_C], a[7:1] };
+            outFlags[FLAG_INDEX_C] = a[0];
+        end
+        ALU1_SRA: begin
+            out = { a[7], a[7:1] };
+            outFlags[FLAG_INDEX_C] = a[0];
+        end
+        ALU1_RR: begin
+            out = { a[0], a[7:1] };
+            outFlags[FLAG_INDEX_C] = a[0];
+        end
+        ALU1_SWAP: begin
+            out = { a[3:0], a[7:4] };
+        end
+        ALU2_ADD,
+        ALU2_ADC: begin
             { cL, out[3:0] } = { 1'b0, a[3:0] } + { 1'b0, b[3:0] } + { 8'b0, flags[FLAG_INDEX_C] & mode[0] };
             outFlags[FLAG_INDEX_H] = cL;
             { cH, out[7:4] } = { 1'b0, a[7:4] } + { 1'b0, b[7:4] } + { 4'b0000, cL };
@@ -46,9 +93,9 @@ module Alu8(
             outFlags[FLAG_INDEX_D] = 0;
             outFlags[FLAG_INDEX_V] = (a[7] == b[7]) & (a[7] != out[7]);
         end
-        ALU8_SUB,
-        ALU8_SBC,
-        ALU8_CP: begin
+        ALU2_SUB,
+        ALU2_SBC,
+        ALU2_CP: begin
             { cL, out[3:0] } = { 1'b0, a[3:0] } - { 1'b0, b[3:0] } - { 8'b0, flags[FLAG_INDEX_C] & mode[0] };
             outFlags[FLAG_INDEX_H] = cL;
             { cH, out[7:4] } = { 1'b0, a[7:4] } - { 1'b0, b[7:4] } - { 4'b0000, cL };
@@ -56,18 +103,18 @@ module Alu8(
             outFlags[FLAG_INDEX_D] = 1;
             outFlags[FLAG_INDEX_V] = (a[7] == b[7]) & (a[7] != out[7]);
         end
-        ALU8_OR: begin
+        ALU2_OR: begin
             out = a | b;
             outFlags[FLAG_INDEX_V] = 0;
         end
-        ALU8_AND,
-        ALU8_TCM,
-        ALU8_TM: begin
+        ALU2_AND,
+        ALU2_TCM,
+        ALU2_TM: begin
             a_and = mode[0] ? a : ~a;
             out = a_and & b;
             outFlags[FLAG_INDEX_V] = 0;
         end
-        ALU8_XOR: begin
+        ALU2_XOR: begin
             out = a ^ b;
             outFlags[FLAG_INDEX_V] = 0;
         end
@@ -75,8 +122,10 @@ module Alu8(
             out <= a;
         endcase
 
-        outFlags[FLAG_INDEX_Z] = (out == 0);
-        outFlags[FLAG_INDEX_S] = out[7];
+        if (mode != ALU1_CLR & mode != ALU1_LD) begin
+            outFlags[FLAG_INDEX_Z] = (out == 0);
+            outFlags[FLAG_INDEX_S] = out[7];
+        end
     end
 endmodule
 
@@ -121,12 +170,12 @@ module Processor(
     `include "alu.vh"
     reg  [7:0] aluA;
     reg  [7:0] aluB;
-    reg  [3:0] aluMode;
+    reg  [4:0] aluMode;
     wire [7:0] aluOut;
     reg  [7:0] flags = 0;
     wire [7:0] flagsOut;
     reg writeFlags = 0;
-    Alu8 alu8(
+    Alu alu(
         .mode(aluMode),
         .a(aluA),
         .b(aluB),
@@ -167,21 +216,50 @@ module Processor(
         readRegister4 = readRegister8(r4(r));
     endfunction
 
-    function [1:3*8] alu8OpName( // maximum of 3 characters
+    function [1:4*8] alu1OpName( // maximum of 4 characters
         input [3:0] instrH
     );
     begin
-        alu8OpName = instrH == ALU8_ADD ? "add" :
-                     instrH == ALU8_ADC ? "adc" :
-                     instrH == ALU8_SUB ? "sub" :
-                     instrH == ALU8_SBC ? "sbc" :
-                     instrH == ALU8_OR  ? "or"  :
-                     instrH == ALU8_AND ? "and" :
-                     instrH == ALU8_TCM ? "tcm" :
-                     instrH == ALU8_TM  ? "tm"  :
-                     instrH == ALU8_CP  ? "cp"  :
-                     instrH == ALU8_XOR ? "xor" :
-                     "?";
+        case (instrH)
+        ALU1_DEC : alu1OpName = "dec";
+        ALU1_RLC : alu1OpName = "rlc";
+        ALU1_INC : alu1OpName = "inc";
+        ALU1_DA  : alu1OpName = "da";
+        ALU1_COM : alu1OpName = "com";
+        ALU1_DECW: alu1OpName = "decw";
+        ALU1_RL  : alu1OpName = "rl";
+        ALU1_INCW: alu1OpName = "incw";
+        ALU1_CLR : alu1OpName = "clr";
+        ALU1_RRC : alu1OpName = "rrc";
+        ALU1_SRA : alu1OpName = "sra";
+        ALU1_RR  : alu1OpName = "rr";
+        ALU1_SWAP: alu1OpName = "swap";
+        default  : alu1OpName = "?";
+        endcase;
+    end
+    endfunction
+    function [4:0] alu2OpCode(
+        input[3:0] instrH
+    );
+        alu2OpCode = { 1'b1, instrH };
+    endfunction
+    function [1:3*8] alu2OpName( // maximum of 3 characters
+        input [3:0] instrH
+    );
+    begin
+        case (alu2OpCode(instrH))
+        ALU2_ADD: alu2OpName = "add";
+        ALU2_ADC: alu2OpName = "adc";
+        ALU2_SUB: alu2OpName = "sub";
+        ALU2_SBC: alu2OpName = "sbc";
+        ALU2_OR : alu2OpName = "or";
+        ALU2_AND: alu2OpName = "and";
+        ALU2_TCM: alu2OpName = "tcm";
+        ALU2_TM : alu2OpName = "tm";
+        ALU2_CP : alu2OpName = "cp";
+        ALU2_XOR: alu2OpName = "xor";
+        default : alu2OpName = "?";
+        endcase
     end
     endfunction
 
@@ -307,6 +385,34 @@ module Processor(
                 $display("  %h %h %h", instruction, second, third);
             end
             case (instrL)
+            4'h0: begin
+                case (instrH)
+                4'h3: begin
+                    $display("    jp IRR%h", second);
+                    //TODO
+                end
+                4'h5: begin
+                    $display("    pop %h", second);
+                    //TODO
+                end
+                4'h7: begin
+                    $display("    push %h", second);
+                    //TODO
+                end
+                4'h8: begin
+                    $display("    decw %h", second);
+                    //TODO
+                end
+                4'hA: begin
+                    $display("    incw %h", second);
+                    //TODO
+                end
+                default: begin
+                    $display("    %s %h", 
+                             alu1OpName(instrH), second);
+                end
+                endcase
+            end
             4'h1: begin
                 $display("    srp %h", second);
                 rp <= second[7:4];
@@ -314,17 +420,17 @@ module Processor(
             4'h2,
             4'h6: begin
                 case (instrH)
-                ALU8_ADD,
-                ALU8_ADC,
-                ALU8_SUB,
-                ALU8_SBC,
-                ALU8_OR,
-                ALU8_AND,
-                ALU8_TCM,
-                ALU8_TM,
-                ALU8_CP,
-                ALU8_XOR: begin
-                    aluMode <= instrH;
+                4'h0,
+                4'h1,
+                4'h2,
+                4'h3,
+                4'h4,
+                4'h5,
+                4'h6,
+                4'h7,
+                4'hA,
+                4'hB: begin
+                    aluMode <= alu2OpCode(instrH);
                     writeRegister <= (instrH[3:2] == 2'b00)     // add, adc, sub, sbc
                                     | (instrH[3:1] == 3'b010)   // or, and
                                     | (instrH      == 4'b1011); // xor
@@ -332,15 +438,15 @@ module Processor(
                     case (instrL)
                     4'h2: begin
                         $display("    %s r%h, r%h",
-                                    alu8OpName(instrH),
-                                    secondH, secondL);
+                                alu2OpName(instrH),
+                                secondH, secondL);
                         dstRegister <= r4(secondH);
                         aluA <= readRegister4(secondH);
                         aluB <= readRegister4(secondL);
                     end
                     4'h6: begin
                         $display("    %s %h, #%h",
-                                alu8OpName(instrH),
+                                alu2OpName(instrH),
                                 second, third);
                         dstRegister <= r8(second);
                         aluA <= readRegister8(r8(second));
@@ -357,7 +463,7 @@ module Processor(
                 $display("    ld r%h, %h", instrH, secondL);
                 dstRegister <= r4(instrH);
                 aluB <= readRegister8(r8(second));
-                aluMode <= ALU8_LD;
+                aluMode <= ALU1_LD;
                 writeRegister <= 1;
             end
             4'h9: begin
@@ -375,7 +481,7 @@ module Processor(
                 $display("    ld r%h, #%h", instrH, second);
                 dstRegister <= r4(instrH);
                 aluA <= second;
-                aluMode <= ALU8_LD;
+                aluMode <= ALU1_LD;
                 writeRegister <= 1;
             end
             4'hD: begin
