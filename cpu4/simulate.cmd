@@ -11,6 +11,7 @@ call :test jp
 call :test jr
 call :test Xcf
 call :test inc
+call :test incw_decw
 
 pause
 goto :repeat

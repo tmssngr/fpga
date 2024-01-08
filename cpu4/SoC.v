@@ -36,8 +36,8 @@ module Alu(
     always @(*) begin
         outFlags = flags;
 
-        case (mode)
-        ALU1_DEC: begin
+        casez (mode)
+        5'b0_?000: begin // ALU1_DEC, ALU1_DECW
             out = a - 8'b01;
             outFlags[FLAG_INDEX_V] = a[7] & ~out[7];
         end
@@ -45,9 +45,13 @@ module Alu(
             out = { a[6:0], flags[FLAG_INDEX_C] };
             outFlags[FLAG_INDEX_C] = a[7];
         end
-        ALU1_INC: begin
+        5'b0_?010: begin // ALU1_INC, ALU1_INCW
             out = a + 8'b01;
             outFlags[FLAG_INDEX_V] = ~a[7] & out[7];
+        end
+        ALU1_INCW_UPPER_0: begin
+            out = a;
+            outFlags[FLAG_INDEX_V] = 0;
         end
         ALU1_DA: begin
             //TODO
@@ -56,15 +60,9 @@ module Alu(
             out = ~a;
             outFlags[FLAG_INDEX_V] = 0;
         end
-        ALU1_DECW: begin
-            //TODO
-        end
         ALU1_RL: begin
             out = { a[6:0], a[7] };
             outFlags[FLAG_INDEX_C] = a[7];
-        end
-        ALU1_INCW: begin
-            //TODO
         end
         ALU1_RRC: begin
             out = { flags[FLAG_INDEX_C], a[7:1] };
@@ -127,6 +125,10 @@ module Alu(
         case (mode)
         ALU1_CLR,  // keep it
         ALU1_LD  : outFlags[FLAG_INDEX_Z] = flags[FLAG_INDEX_Z];
+
+        ALU1_DECW, // set only if set from the lower-byte operation, too
+        ALU1_INCW,
+        ALU1_INCW_UPPER_0: outFlags[FLAG_INDEX_Z] = flags[FLAG_INDEX_Z] & (out == 0);
 
         default  : outFlags[FLAG_INDEX_Z] = (out == 0);
         endcase
@@ -329,6 +331,7 @@ module Processor(
     localparam STATE_WAIT_3       = 4;
     localparam STATE_READ_3       = 5;
     localparam STATE_DECODE       = 6;
+    localparam STATE_ALU1_WORD    = 7;
     reg [2:0] state = STATE_FETCH_INSTR;
 
     wire [7:0] nextPc = (  state == STATE_READ_INSTR
@@ -424,11 +427,21 @@ module Processor(
                 end
                 4'h8: begin
                     $display("    decw %h", second);
-                    //TODO
+                    aluMode <= ALU1_DEC;
+                    writeRegister <= 1;
+                    writeFlags <= 1;
+                    dstRegister <= r8(second | 8'h1);
+                    aluA <= readRegister8(second | 8'h1);
+                    state <= STATE_ALU1_WORD;
                 end
                 4'hA: begin
                     $display("    incw %h", second);
-                    //TODO
+                    aluMode <= ALU1_INC;
+                    writeRegister <= 1;
+                    writeFlags <= 1;
+                    dstRegister <= r8(second | 8'h1);
+                    aluA <= readRegister8(second | 8'h1);
+                    state <= STATE_ALU1_WORD;
                 end
                 default: begin
                     $display("   %s %h", 
@@ -563,6 +576,24 @@ module Processor(
             default: begin
             end
             endcase
+        end
+
+        STATE_ALU1_WORD: begin
+            dstRegister <= { dstRegister[7:1], 1'b0 };
+            aluA <= readRegister8({dstRegister[7:1], 1'b0});
+            // inc(w) -> instrH[1] == 1
+            // dec(w) -> instrH[1] == 0
+            // carry? (aluOut == 0x00 for inc, == 0xFF for dec)
+            if (aluOut == {8{~instrH[1]}}) begin
+                aluMode <= aluMode | 'h8; // inc/dec -> incw/decw
+                // ALU1_INCW and ALU1_DECW have a special handling for the zero flag
+            end
+            else begin
+                aluMode <= ALU1_INCW_UPPER_0;
+            end
+            writeRegister <= 1;
+            writeFlags <= 1;
+            state <= STATE_FETCH_INSTR;
         end
 
         endcase
