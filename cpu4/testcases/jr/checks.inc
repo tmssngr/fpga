@@ -6,7 +6,7 @@
         `assertInstr('h0B);
     repeat (2) @(negedge clk);
         `assertPc(2);
-        `assert(uut.proc.second, 'hFE);
+        `assertSecond('hFE);
 
 // ld r0, #3
     repeat (3) @(negedge clk);
@@ -14,65 +14,65 @@
         `assertInstr('h0C);
     repeat (2) @(negedge clk);
         `assertPc(4);
-        `assert(uut.proc.second, 'h03);
+        `assertSecond('h03);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h03);
+        `assertRegister(0, 'h03);
 
 // 4: add r0, r1
         `assertPc(5);
     repeat (4) @(negedge clk);
         `assertInstr('h06);
-        `assert(uut.proc.second,      'h00);
-        `assert(uut.proc.third,       'hFF);
+        `assertSecond('h00);
+        `assertThird('hFF);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h02);
+        `assertRegister(0, 'h02);
         // ch
-        `assert(uut.proc.flags, 'b1000_0100);
+        `assertFlags('b1000_0100);
 
 // jr nz, L1
     repeat (2) @(negedge clk);
         `assertInstr('hEB);
-        `assert(uut.proc.second,      'hFB);
+        `assertSecond('hFB);
     repeat (1) @(negedge clk);
 
 // 4: add r0, r1
         `assertPc(4);
     repeat (6) @(negedge clk);
         `assertInstr('h06);
-        `assert(uut.proc.second,      'h00);
-        `assert(uut.proc.third,       'hFF);
+        `assertSecond('h00);
+        `assertThird('hFF);
     repeat (2) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h01);
+        `assertRegister(0, 'h01);
         // ch
-        `assert(uut.proc.flags, 'b1000_0100);
+        `assertFlags('b1000_0100);
 
 // jr nz, L1
     repeat (3) @(negedge clk);
         `assertInstr('hEB);
-        `assert(uut.proc.second,      'hFB);
+        `assertSecond('hFB);
     repeat (1) @(negedge clk);
 
 // 4: add r0, r1
         `assertPc(4);
     repeat (6) @(negedge clk);
         `assertInstr('h06);
-        `assert(uut.proc.second,      'h00);
-        `assert(uut.proc.third,       'hFF);
+        `assertSecond('h00);
+        `assertThird('hFF);
     repeat (2) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h00);
+        `assertRegister(0, 'h00);
         // czh
-        `assert(uut.proc.flags, 'b1100_0100);
+        `assertFlags('b1100_0100);
 
 // jr nz, L1
     repeat (3) @(negedge clk);
         `assertInstr('hEB);
-        `assert(uut.proc.second,      'hFB);
+        `assertSecond('hFB);
 
 // jr 0
         `assertPc(9);
     repeat (5) @(negedge clk);
         `assertInstr('h8B);
-        `assert(uut.proc.second,      'hF5);
+        `assertSecond('hF5);
     @(negedge clk);
         `assertPc(0);
 

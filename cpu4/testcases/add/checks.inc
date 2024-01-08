@@ -6,97 +6,97 @@
         `assertInstr('h0C);
     repeat (2) @(negedge clk);
         `assertPc(2);
-        `assert(uut.proc.second, 'h09);
+        `assertSecond('h09);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h09);
+        `assertRegister(0, 'h09);
 
 // ld r1, #1
         `assertPc(3);
         `assertInstr('h1C);
     repeat (2) @(negedge clk);
         `assertPc(4);
-        `assert(uut.proc.second, 'h01);
+        `assertSecond('h01);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[1], 'h01);
+        `assertRegister(1, 'h01);
 
 // add r0, r1
         `assertPc(5);
         `assertInstr('h02);
     repeat (2) @(negedge clk);
         `assertPc(6);
-        `assert(uut.proc.second, 'h01);
+        `assertSecond('h01);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h0A);
-        `assert(uut.proc.registers[1], 'h01);
-        `assert(uut.proc.flags, 'b0000_0000);
+        `assertRegister(0, 'h0A);
+        `assertRegister(1, 'h01);
+        `assertFlags('b0000_0000);
 
 // ld r1, #6
         `assertPc(7);
         `assertInstr('h1C);
     repeat (2) @(negedge clk);
         `assertPc(8);
-        `assert(uut.proc.second, 'h06);
+        `assertSecond('h06);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[1], 'h06);
+        `assertRegister(1, 'h06);
 
 // add r0, r1
         `assertPc(9);
         `assertInstr('h02);
     repeat (2) @(negedge clk);
         `assertPc(10);
-        `assert(uut.proc.second, 'h01);
+        `assertSecond('h01);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h10);
-        `assert(uut.proc.registers[1], 'h06);
+        `assertRegister(0, 'h10);
+        `assertRegister(1, 'h06);
         // h
-        `assert(uut.proc.flags, 'b0000_0100);
+        `assertFlags('b0000_0100);
 
 // ld r1, #80
     repeat (5) @(negedge clk);
-        `assert(uut.proc.registers[1], 'h80);
+        `assertRegister(1, 'h80);
 
 // add r0, r1
     repeat (2) @(negedge clk);
         `assertInstr('h02);
-        `assert(uut.proc.second,      'h01);
+        `assertSecond('h01);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h90);
+        `assertRegister(0, 'h90);
         // s
-        `assert(uut.proc.flags, 'b0010_0000);
+        `assertFlags('b0010_0000);
 
 // ld r1, #70
     repeat (5) @(negedge clk);
-        `assert(uut.proc.registers[1], 'h70);
+        `assertRegister(1, 'h70);
 
 // add r0, r1
     repeat (2) @(negedge clk);
         `assertInstr('h02);
-        `assert(uut.proc.second,      'h01);
+        `assertSecond('h01);
     repeat (3) @(negedge clk);
-        `assert(uut.proc.registers[0], 'h00);
+        `assertRegister(0, 'h00);
         // cz
-        `assert(uut.proc.flags, 'b1100_0000);
+        `assertFlags('b1100_0000);
 
 // ld r0, #FF
     repeat (5) @(negedge clk);
-        `assert(uut.proc.registers[0], 'hFF);
+        `assertRegister(0, 'hFF);
 
 // ld r1, #FF
     repeat (5) @(negedge clk);
-        `assert(uut.proc.registers[1], 'hFF);
+        `assertRegister(1, 'hFF);
 
 // add r1, r0
     repeat (5) @(negedge clk);
-        `assert(uut.proc.registers[0], 'hFF);
-        `assert(uut.proc.registers[1], 'hFE);
+        `assertRegister(0, 'hFF);
+        `assertRegister(1, 'hFE);
         // csh
-        `assert(uut.proc.flags, 'b1010_0100);
+        `assertFlags('b1010_0100);
 
 // jmp 0
     repeat (4) @(negedge clk);
         `assertInstr('h8D);
-        `assert(uut.proc.second,      'h00);
-        `assert(uut.proc.third,       'h00);
+        `assertSecond('h00);
+        `assertThird('h00);
     repeat (2) @(negedge clk);
         `assertPc(0);
 
