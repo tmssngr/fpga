@@ -10,7 +10,7 @@ call :test add
 call :test jp
 call :test jr
 call :test Xcf
-call :test inc
+call :test inc_dec
 call :test incw_decw
 
 pause
