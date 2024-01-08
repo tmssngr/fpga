@@ -66,9 +66,6 @@ module Alu(
         ALU1_INCW: begin
             //TODO
         end
-        ALU1_CLR: begin
-            out = 0;
-        end
         ALU1_RRC: begin
             out = { flags[FLAG_INDEX_C], a[7:1] };
             outFlags[FLAG_INDEX_C] = a[0];
@@ -118,14 +115,28 @@ module Alu(
             out = a ^ b;
             outFlags[FLAG_INDEX_V] = 0;
         end
-        default:
+        ALU1_LD: begin
             out <= a;
+        end
+        // ALU1_CLR
+        default : begin
+            out = 0;
+        end
         endcase
 
-        if (mode != ALU1_CLR & mode != ALU1_LD) begin
-            outFlags[FLAG_INDEX_Z] = (out == 0);
-            outFlags[FLAG_INDEX_S] = out[7];
-        end
+        case (mode)
+        ALU1_CLR,  // keep it
+        ALU1_LD  : outFlags[FLAG_INDEX_Z] = flags[FLAG_INDEX_Z];
+
+        default  : outFlags[FLAG_INDEX_Z] = (out == 0);
+        endcase
+
+        case (mode)
+        ALU1_CLR, // keep it
+        ALU1_LD : outFlags[FLAG_INDEX_S] = flags[FLAG_INDEX_S];
+
+        default : outFlags[FLAG_INDEX_S] = out[7];
+        endcase
     end
 endmodule
 
