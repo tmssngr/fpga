@@ -58,7 +58,7 @@ VCD info: dumpfile SoC.vcd opened for output.
     inc 00
     alu:    ff       00    =>    00
          11111111 00000000 => 00000000
-    flags = 0101_0000
+    flags = 0100_0000
     reg[00] = 00
 
 0e: read instruction

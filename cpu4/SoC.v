@@ -39,7 +39,7 @@ module Alu(
         case (mode)
         ALU1_DEC: begin
             out = a - 8'b01;
-            outFlags[FLAG_INDEX_V] = a[7] != out[7];
+            outFlags[FLAG_INDEX_V] = a[7] & ~out[7];
         end
         ALU1_RLC: begin
             out = { a[6:0], flags[FLAG_INDEX_C] };
@@ -47,7 +47,7 @@ module Alu(
         end
         ALU1_INC: begin
             out = a + 8'b01;
-            outFlags[FLAG_INDEX_V] = a[7] != out[7];
+            outFlags[FLAG_INDEX_V] = ~a[7] & out[7];
         end
         ALU1_DA: begin
             //TODO

@@ -63,8 +63,8 @@
         `assert(uut.proc.second, 'h00);
     repeat (3) @(negedge clk);
         `assert(uut.proc.registers[0], 'h00);
-        // zv
-        `assert(uut.proc.flags, 'b0101_0000);
+        // z
+        `assert(uut.proc.flags, 'b0100_0000);
 
 
 // jmp 0
