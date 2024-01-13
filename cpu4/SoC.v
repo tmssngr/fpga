@@ -324,8 +324,34 @@ module Processor(
                 endcase
             end
             4'h1: begin
-                $display("    srp %h", second);
-                rp <= second[7:4];
+                case (instrH)
+                4'h3: begin
+                    $display("    srp %h", second);
+                    rp <= second[7:4];
+                end
+                4'h5: begin
+                    $display("    pop @%h", second);
+                    //TODO
+                end
+                4'h7: begin
+                    $display("    push @%h", second);
+                    //TODO
+                end
+                4'h8: begin
+                    $display("    decw @%h", second);
+                    //TODO
+                end
+                4'hA: begin
+                    $display("    incw @%h", second);
+                    //TODO
+                end
+                default: begin
+                    $display("   %s @%h", 
+                             alu1OpName(instrH), second);
+                    srcRegister <= readRegister8(r8(second));
+                    state <= STATE_ALU1_OP;
+                end
+                endcase
             end
             4'h2,
             4'h6: begin
@@ -466,15 +492,11 @@ module Processor(
         end
 
         STATE_ALU1_OP: begin
-            case (instrL)
-            4'h0: begin
-                aluMode <= alu1OpCode(instrH);
-                writeRegister <= 1;
-                writeFlags <= 1;
-                dstRegister <= srcRegister;
-                aluA <= readRegister8(srcRegister);
-            end
-            endcase
+            aluMode <= alu1OpCode(instrH);
+            writeRegister <= 1;
+            writeFlags <= 1;
+            dstRegister <= srcRegister;
+            aluA <= readRegister8(srcRegister);
             state <= STATE_FETCH_INSTR;
         end
 

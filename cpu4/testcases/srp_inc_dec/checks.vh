@@ -165,6 +165,36 @@
         // s
         `assertFlags('b0010_0000);
 
+// ld r1, #10
+	@(negedge clk);
+		`assertState(STATE_WAIT_2);
+    repeat (2) @(negedge clk);
+        `assertState(STATE_DECODE);
+        `assertInstr('h1C);
+        `assertSecond('h10);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assertRegister('h10, 'hFE);
+        `assertRegister('h11, 'h10);
+
+// dec @r1
+    @(negedge clk);
+		`assertState(STATE_WAIT_2);
+    repeat (2) @(negedge clk);
+        `assertState(STATE_DECODE);
+        `assertInstr('h01);
+        `assertSecond('hE1);
+    @(negedge clk);
+        `assertState(STATE_ALU1_OP);
+        `assert(uut.proc.srcRegister, 'h10);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assertRegister('h10, 'hFD);
+        `assertRegister('h11, 'h10);
+        // s
+        `assertFlags('b0010_0000);
 
 // jmp 0
     repeat (5) @(negedge clk);

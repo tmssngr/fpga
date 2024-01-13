@@ -108,10 +108,27 @@ VCD info: dumpfile SoC.vcd opened for output.
     reg[10] = fe
 
 18: read instruction
-  8d
+  1c
 19: read 2nd byte
+  1c 10
+    ld r1, #10
+    reg[11] = 10
+
+1a: read instruction
+  01
+1b: read 2nd byte
+  01 e1
+    dec @e1
+    alu:    fe       00    =>    fd
+         11111110 00000000 => 11111101
+    flags = 0010_0000
+    reg[10] = fd
+
+1c: read instruction
+  8d
+1d: read 2nd byte
   8d 00
-1a: read 3rd byte
+1e: read 3rd byte
   8d 00 00
     jmp    , 0000
 

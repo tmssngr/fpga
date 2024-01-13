@@ -16,5 +16,8 @@ initial begin
       asm_dec('h10);
       asm_dec('h10);
 
+      asm_ld_r_IM(1, 8'h10);
+      asm_decIn('hE1);
+
       asm_jp(JC_ALWAYS, L0_);
 end

@@ -217,6 +217,12 @@ task asm_dec;
         asm2(8'h00, dst);
     end
 endtask
+task asm_decIn;
+    input [7:0] dst;
+    begin
+        asm2(8'h01, dst);
+    end
+endtask
 task asm_rlc;
     input [7:0] dst;
     begin
