@@ -295,3 +295,15 @@ task asm_swap;
         asm2(8'hF0, dst);
     end
 endtask
+task asm_push;
+    input [7:0] src;
+    begin
+        asm2(8'h70, src);
+    end
+endtask
+task asm_pop;
+    input [7:0] dst;
+    begin
+        asm2(8'h50, dst);
+    end
+endtask

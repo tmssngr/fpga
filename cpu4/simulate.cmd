@@ -13,6 +13,7 @@ call :test Xcf
 call :test srp_inc_dec
 call :test incw_decw
 call :test da
+call :test push_pop
 
 pause
 goto :repeat

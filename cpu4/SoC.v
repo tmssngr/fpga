@@ -22,15 +22,17 @@ endmodule
 
 module Processor(
     input         clk,
+    input         reset,
     output [15:0] memAddr,
     input  [7:0]  memDataRead,
     output        memStrobe
 );
     `include "flags.vh"
 
-    reg [15:0] pc;
+    reg [15:0] pc, sp, addr;
     initial begin
         pc = 0;
+        sp = 0;
     end
 
     reg  [7:0] instruction;
@@ -98,6 +100,8 @@ module Processor(
         8'b0???_????: readRegister8 = registers[r[6:0]];
         8'hFC:        readRegister8 = flags;
         8'hFD:        readRegister8 = { rp, 4'h0 };
+        8'hFE:        readRegister8 = sp[15:8];
+        8'hFF:        readRegister8 = sp[7:0];
         default:      readRegister8 = 0;
         endcase
     endfunction
@@ -215,6 +219,8 @@ module Processor(
                             : ( state == STATE_DECODE & isJumpRel & takeBranch) 
                                 ? pc + { {8{second[7]}}, second }
                                 : pc;
+    assign memAddr =   state < STATE_DECODE
+                     ? pc : addr;
     assign memStrobe = (state == STATE_FETCH_INSTR)
                      | (state == STATE_WAIT_2 & ~isInstrSize1)
                      | (state == STATE_WAIT_3);
@@ -234,6 +240,8 @@ module Processor(
             8'b0???_????: registers[dstRegister] <= aluOut;
             8'hFC:        flags                  <= aluOut;
             8'hFD:        rp                     <= aluOut[7:4];
+            8'hFE:        sp[15:8]               <= aluOut;
+            8'hFF:        sp[7:0]                <= aluOut;
             endcase
         end
         writeRegister <= 0;
@@ -291,11 +299,16 @@ module Processor(
                 end
                 4'h5: begin
                     $display("    pop %h", second);
-                    //TODO
+                    // dst <- @SP
+                    // SP <- SP + 1
+                    srcRegister <= r8(second);
+                    state <= STATE_POP;
                 end
                 4'h7: begin
                     $display("    push %h", second);
-                    //TODO
+                    sp <= sp - 1;
+                    srcRegister <= r8(second);
+                    state <= STATE_PUSH;
                 end
                 4'h8: begin
                     $display("    decw %h", second);
@@ -516,12 +529,27 @@ module Processor(
             state <= STATE_FETCH_INSTR;
         end
 
+        STATE_PUSH: begin
+            aluMode <= ALU1_LD;
+            aluA <= readRegister8(srcRegister);
+            dstRegister <= sp[7:0];
+            writeRegister <= 1;
+            state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_POP: begin
+            aluMode <= ALU1_LD;
+            aluA <= readRegister8(sp[7:0]);
+            sp <= sp + 1;
+            dstRegister <= srcRegister;
+            writeRegister <= 1;
+            state <= STATE_FETCH_INSTR;
+        end
+
         endcase
 
         pc <= nextPc;
     end
-
-    assign memAddr = pc;
 endmodule
 
 module SoC(
