@@ -318,6 +318,7 @@ module Processor(
                 default: begin
                     $display("   %s %h", 
                              alu1OpName(instrH), second);
+                    aluMode <= alu1OpCode(instrH);
                     srcRegister <= r8(second);
                     state <= STATE_ALU1_OP;
                 end
@@ -348,6 +349,7 @@ module Processor(
                 default: begin
                     $display("   %s @%h", 
                              alu1OpName(instrH), second);
+                    aluMode <= alu1OpCode(instrH);
                     srcRegister <= readRegister8(r8(second));
                     state <= STATE_ALU1_OP;
                 end
@@ -492,11 +494,25 @@ module Processor(
         end
 
         STATE_ALU1_OP: begin
-            aluMode <= alu1OpCode(instrH);
+            aluA <= readRegister8(srcRegister);
+            dstRegister <= srcRegister;
+            writeRegister <= 1;
+            writeFlags <= 1;
+
+            if (aluMode == ALU1_DA) begin
+                state <= STATE_ALU1_DA;
+            end
+            else begin
+                state <= STATE_FETCH_INSTR;
+            end
+        end
+
+        STATE_ALU1_DA: begin
+            aluA <= aluOut;
+            aluMode <= ALU1_DA_H;
             writeRegister <= 1;
             writeFlags <= 1;
             dstRegister <= srcRegister;
-            aluA <= readRegister8(srcRegister);
             state <= STATE_FETCH_INSTR;
         end
 

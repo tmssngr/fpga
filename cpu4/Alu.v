@@ -37,7 +37,34 @@ module Alu(
             outFlags[FLAG_INDEX_V] = 0;
         end
         ALU1_DA: begin
-            //TODO
+            if (flags[FLAG_INDEX_D] == 1'b0) begin
+                // after add
+                { cL, out } = { 1'b0, a } + 
+                    (flags[FLAG_INDEX_H] || (a[3] && (a[2] || a[1])) ? 9'h6 : 9'h0);
+                outFlags[FLAG_INDEX_C] = cL;
+            end
+            else begin
+                // after sub
+                { cL, out } = { 1'b0, a } -  
+                    (flags[FLAG_INDEX_H] ? 9'h6 : 9'h0);
+                outFlags[FLAG_INDEX_C] = cL | flags[FLAG_INDEX_C];
+            end
+        end
+        ALU1_DA_H: begin
+            if (flags[FLAG_INDEX_D] == 1'b0) begin
+                // after add
+                { cH, out[7:4] } = { 1'b0, a[7:4] } + {
+                    1'h0,
+                    ((flags[FLAG_INDEX_C] || (a[7] && (a[6] || a[5]))) ? 4'h6 : 4'h0)
+                };
+                outFlags[FLAG_INDEX_C] = cH;
+            end
+            else begin
+                // after sub
+                { cL, out[7:4] } = { 1'b0, a[7:4] } -  
+                    (flags[FLAG_INDEX_C] ? 5'h6 : 5'h0);
+                outFlags[FLAG_INDEX_C] = cL | flags[FLAG_INDEX_C];
+            end
         end
         ALU1_COM: begin
             out = ~a;

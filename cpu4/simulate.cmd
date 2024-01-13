@@ -5,13 +5,14 @@ call C:\oss-cad-suite\environment.bat
 
 :repeat
 cls
-::call :simulate SoC
+call :simulate Alu
 call :test add
 call :test jp
 call :test jr
 call :test Xcf
 call :test srp_inc_dec
 call :test incw_decw
+call :test da
 
 pause
 goto :repeat

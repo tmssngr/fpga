@@ -7,3 +7,4 @@
     localparam STATE_DECODE       = 6;
     localparam STATE_ALU1_WORD    = 7;
     localparam STATE_ALU1_OP      = 8;
+    localparam STATE_ALU1_DA      = 9;
