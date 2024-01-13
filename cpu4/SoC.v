@@ -55,6 +55,7 @@ module Processor(
     reg [3:0] rp = 0;
     reg [7:0] registers[0:'h7F];
 
+    reg [7:0] srcRegister;
     reg [7:0] dstRegister;
     reg writeRegister = 0;
 
@@ -203,7 +204,7 @@ module Processor(
     endfunction
 
     `include "states.vh"
-    reg [2:0] state = STATE_FETCH_INSTR;
+    reg [3:0] state = STATE_FETCH_INSTR;
 
     wire [7:0] nextPc = (  state == STATE_READ_INSTR
                          | state == STATE_READ_2
@@ -317,11 +318,8 @@ module Processor(
                 default: begin
                     $display("   %s %h", 
                              alu1OpName(instrH), second);
-                    aluMode <= alu1OpCode(instrH);
-                    writeRegister <= 1;
-                    writeFlags <= 1;
-                    dstRegister <= r8(second);
-                    aluA <= readRegister8(second);
+                    srcRegister <= r8(second);
+                    state <= STATE_ALU1_OP;
                 end
                 endcase
             end
@@ -464,6 +462,19 @@ module Processor(
             end
             writeRegister <= 1;
             writeFlags <= 1;
+            state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_ALU1_OP: begin
+            case (instrL)
+            4'h0: begin
+                aluMode <= alu1OpCode(instrH);
+                writeRegister <= 1;
+                writeFlags <= 1;
+                dstRegister <= srcRegister;
+                aluA <= readRegister8(srcRegister);
+            end
+            endcase
             state <= STATE_FETCH_INSTR;
         end
 

@@ -29,6 +29,9 @@
         `assertSecond('h10);
         `assertState(STATE_DECODE);
     @(negedge clk);
+        `assertState(STATE_ALU1_OP);
+        `assert(uut.proc.srcRegister, 'h10);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'h0A);
@@ -42,6 +45,9 @@
     repeat (2) @(negedge clk);
         `assertSecond('h10);
         `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_ALU1_OP);
+        `assert(uut.proc.srcRegister, 'h10);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -67,6 +73,9 @@
         `assertInstr('h20);
         `assertSecond('h10);
     @(negedge clk);
+        `assertState(STATE_ALU1_OP);
+        `assert(uut.proc.srcRegister, 'h10);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'h80);
@@ -80,7 +89,7 @@
     repeat (3) @(negedge clk);
         `assertInstr('h00);
         `assertSecond('h10);
-    @(negedge clk);
+    repeat (2) @(negedge clk);
         `assertRegister('h10, 'h7F);
         // v
         `assertFlags('b0001_0000);
@@ -104,6 +113,7 @@
         `assertInstr('h20);
         `assertSecond('h10);
     @(negedge clk);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'hFF);
@@ -117,6 +127,7 @@
         `assertState(STATE_DECODE);
         `assertInstr('h20);
         `assertSecond('h10);
+    @(negedge clk);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -132,6 +143,7 @@
         `assertInstr('h00);
         `assertSecond('h10);
     @(negedge clk);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'hFF);
@@ -145,6 +157,7 @@
         `assertState(STATE_DECODE);
         `assertInstr('h00);
         `assertSecond('h10);
+    @(negedge clk);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
