@@ -2,7 +2,9 @@ module testSoC();
 
 `include "assert.vh"
 `include "alu.vh"
+`include "states.vh"
 `define assertPc(value)            if (uut.proc.pc             !== value) begin $display("ASSERTION FAILED in %m: pc(%h) != value"         , uut.proc.pc                 ); $finish(2); end
+`define assertState(value)         if (uut.proc.state          !== value) begin $display("ASSERTION FAILED in %m: state(%h) != value"      , uut.proc.state              ); $finish(2); end
 `define assertInstr(value)         if (uut.proc.instruction    !== value) begin $display("ASSERTION FAILED in %m: instruction(%h) != value", uut.proc.instruction        ); $finish(2); end
 `define assertSecond(value)        if (uut.proc.second         !== value) begin $display("ASSERTION FAILED in %m: second(%h) != value"     , uut.proc.second             ); $finish(2); end
 `define assertThird(value)         if (uut.proc.third          !== value) begin $display("ASSERTION FAILED in %m: third(%h) != value"      , uut.proc.third              ); $finish(2); end
