@@ -205,6 +205,12 @@ task asm_jp;
     end
 endtask
 
+task asm_srp;
+    input [7:0] dst;
+    begin
+        asm2(8'h31, dst);
+    end
+endtask
 task asm_dec;
     input [7:0] dst;
     begin
