@@ -8,8 +8,8 @@ module Memory(
 );
 
     reg [7:0] memory[0:255];
-`include "assembly.inc"
-`include "program.inc"
+`include "assembly.vh"
+`include "program.vh"
 
     always @(posedge clk) begin
         if (strobe) begin
