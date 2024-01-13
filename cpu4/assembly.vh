@@ -102,7 +102,7 @@ task asm_add_R_IM;
     end
 endtask
 
-task asm_adc;
+task asm_adc_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -110,7 +110,7 @@ task asm_adc;
     end
 endtask
 
-task asm_sub;
+task asm_sub_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -118,7 +118,7 @@ task asm_sub;
     end
 endtask
 
-task asm_sbc;
+task asm_sbc_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -126,7 +126,7 @@ task asm_sbc;
     end
 endtask
 
-task asm_or;
+task asm_or_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -134,7 +134,7 @@ task asm_or;
     end
 endtask
 
-task asm_and;
+task asm_and_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -142,7 +142,7 @@ task asm_and;
     end
 endtask
 
-task asm_tcm;
+task asm_tcm_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -150,7 +150,7 @@ task asm_tcm;
     end
 endtask
 
-task asm_tm;
+task asm_tm_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -158,7 +158,7 @@ task asm_tm;
     end
 endtask
 
-task asm_cp;
+task asm_cp_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
@@ -166,7 +166,7 @@ task asm_cp;
     end
 endtask
 
-task asm_xor;
+task asm_xor_r_r;
     input [3:0] dst;
     input [3:0] src;
     begin
