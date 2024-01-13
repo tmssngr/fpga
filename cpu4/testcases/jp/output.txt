@@ -1,25 +1,25 @@
 VCD info: dumpfile SoC.vcd opened for output.
 
-00: read instruction
+0000: read instruction
   0d
-01: read 2nd byte
+0001: read 2nd byte
   0d ff
-02: read 3rd byte
+0002: read 3rd byte
   0d ff fe
     jmp   f, fffe
 
-03: read instruction
+0003: read instruction
   0c
-04: read 2nd byte
+0004: read 2nd byte
   0c 03
     ld r0, #03
     reg[00] = 03
 
-05: read instruction
+0005: read instruction
   06
-06: read 2nd byte
+0006: read 2nd byte
   06 00
-07: read 3rd byte
+0007: read 3rd byte
   06 00 ff
     add 00, #ff
     alu:    03       ff    =>    02
@@ -27,19 +27,19 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 1000_0100
     reg[00] = 02
 
-08: read instruction
+0008: read instruction
   ed
-09: read 2nd byte
+0009: read 2nd byte
   ed 00
-0a: read 3rd byte
+000a: read 3rd byte
   ed 00 05
     jmp  nz, 0005
 
-05: read instruction
+0005: read instruction
   06
-06: read 2nd byte
+0006: read 2nd byte
   06 00
-07: read 3rd byte
+0007: read 3rd byte
   06 00 ff
     add 00, #ff
     alu:    02       ff    =>    01
@@ -47,19 +47,19 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 1000_0100
     reg[00] = 01
 
-08: read instruction
+0008: read instruction
   ed
-09: read 2nd byte
+0009: read 2nd byte
   ed 00
-0a: read 3rd byte
+000a: read 3rd byte
   ed 00 05
     jmp  nz, 0005
 
-05: read instruction
+0005: read instruction
   06
-06: read 2nd byte
+0006: read 2nd byte
   06 00
-07: read 3rd byte
+0007: read 3rd byte
   06 00 ff
     add 00, #ff
     alu:    01       ff    =>    00
@@ -67,21 +67,21 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 1100_0100
     reg[00] = 00
 
-08: read instruction
+0008: read instruction
   ed
-09: read 2nd byte
+0009: read 2nd byte
   ed 00
-0a: read 3rd byte
+000a: read 3rd byte
   ed 00 05
     jmp  nz, 0005
 
-0b: read instruction
+000b: read instruction
   8d
-0c: read 2nd byte
+000c: read 2nd byte
   8d 00
-0d: read 3rd byte
+000d: read 3rd byte
   8d 00 00
     jmp    , 0000
 
-00: read instruction
+0000: read instruction
 testSoC: SUCCESS

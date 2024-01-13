@@ -2,7 +2,7 @@
 
 module Memory(
     input clk,
-    input [7:0]     addr,
+    input [15:0]     addr,
     output reg[7:0] dataRead,
     input           strobe
 );
@@ -21,14 +21,14 @@ endmodule
 `include "Alu.v"
 
 module Processor(
-    input        clk,
-    output [7:0] memAddr,
-    input  [7:0] memDataRead,
-    output       memStrobe
+    input         clk,
+    output [15:0] memAddr,
+    input  [7:0]  memDataRead,
+    output        memStrobe
 );
     `include "flags.vh"
 
-    reg [7:0] pc;
+    reg [15:0] pc;
     initial begin
         pc = 0;
     end
@@ -527,10 +527,9 @@ endmodule
 module SoC(
     input clk
 );
-
-    wire [7:0] memAddr;
-    wire [7:0] memData;
-    wire       memStrobe;
+    wire [15:0] memAddr;
+    wire [7:0]  memData;
+    wire        memStrobe;
 
     Memory mem(
         .clk(clk),
