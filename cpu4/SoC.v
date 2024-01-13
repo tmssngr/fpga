@@ -162,20 +162,20 @@ module Processor(
     end
     endfunction
 
-    reg regBranchTmp;
+    reg takeBranchTmp;
     always @(*) begin
         case (instrH[2:0])
-        0: regBranchTmp = 0;
-        1: regBranchTmp =  flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V];
-        2: regBranchTmp = (flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V]) | flags[FLAG_INDEX_Z];
-        3: regBranchTmp =  flags[FLAG_INDEX_C] | flags[FLAG_INDEX_Z];
-        4: regBranchTmp =  flags[FLAG_INDEX_V];
-        5: regBranchTmp =  flags[FLAG_INDEX_S];
-        6: regBranchTmp =  flags[FLAG_INDEX_Z];
-        7: regBranchTmp =  flags[FLAG_INDEX_C];
+        0: takeBranchTmp = 0;
+        1: takeBranchTmp =  flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V];
+        2: takeBranchTmp = (flags[FLAG_INDEX_S] ^ flags[FLAG_INDEX_V]) | flags[FLAG_INDEX_Z];
+        3: takeBranchTmp =  flags[FLAG_INDEX_C] | flags[FLAG_INDEX_Z];
+        4: takeBranchTmp =  flags[FLAG_INDEX_V];
+        5: takeBranchTmp =  flags[FLAG_INDEX_S];
+        6: takeBranchTmp =  flags[FLAG_INDEX_Z];
+        7: takeBranchTmp =  flags[FLAG_INDEX_C];
         endcase
     end
-    wire takeBranch = regBranchTmp ^ instrH[3];
+    wire takeBranch = takeBranchTmp ^ instrH[3];
 
     function [1:3*8] ccName( // maximum of 3 characters
         input [3:0] instrH
