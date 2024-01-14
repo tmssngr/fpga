@@ -185,6 +185,14 @@ task asm_cp_r_r;
     end
 endtask
 
+task asm_cp_r_Ir;
+    input [3:0] dst;
+    input [3:0] src;
+    begin
+        asm2(8'hA3, {dst, src});
+    end
+endtask
+
 task asm_xor_r_r;
     input [3:0] dst;
     input [3:0] src;

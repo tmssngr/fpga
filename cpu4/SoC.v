@@ -415,6 +415,49 @@ module Processor(
                 end
                 endcase
             end
+            4'h3: begin
+                casez (instrH)
+                4'h8: begin
+                    $display("    ldei r%h, Irr%h",
+                            secondH, secondL);
+                    //TODO
+                end
+                4'h9: begin
+                    $display("    ldei Irr%h, r%h",
+                            secondL, secondH);
+                    //TODO
+                end
+                4'hC: begin
+                    $display("    ldci r%h, Irr%h",
+                            secondH, secondL);
+                    //TODO
+                end
+                4'hD: begin
+                    $display("    ldci Irr%h, r%h",
+                            secondL, secondH);
+                    //TODO
+                end
+                4'hE: begin
+                    $display("    ld r%h, Ir%h",
+                            secondL, secondH);
+                    //TODO
+                end
+                4'hF: begin
+                    $display("    ld Ir%h, r%h",
+                            secondL, secondH);
+                    //TODO
+                end
+                default: begin
+                    $display("    %s r%h, Ir%h",
+                            alu2OpName(instrH),
+                            secondH, secondL);
+                    dstRegister <= r4(secondH);
+                    aluA <= readRegister4(secondH);
+                    srcRegister <= readRegister4(secondL);
+                    state <= STATE_ALU2_IR;
+                end
+                endcase
+            end
             4'h6: begin
                 case (instrH)
                 4'b100x,
@@ -554,6 +597,10 @@ module Processor(
             writeFlags <= 1;
             dstRegister <= srcRegister;
             state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_ALU2_IR: begin
+            aluB <= readRegister8(srcRegister);
         end
 
         STATE_ALU2_OP: begin
