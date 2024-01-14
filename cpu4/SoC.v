@@ -458,6 +458,36 @@ module Processor(
                 end
                 endcase
             end
+            4'h4: begin
+                case (instrH)
+                4'b100x,
+                4'b1100,
+                4'b1111: begin
+                    $display("    ? %h", instruction);
+                end
+                4'hD: begin
+                    $display("    call IRR%h", directAddress);
+                    //TODO
+                end
+                4'hE: begin
+                    $display("    ld %h, %h", second, third);
+                    dstRegister <= r8(second);
+                    aluA <= readRegister8(third);
+                    aluMode <= ALU1_LD;
+                    writeRegister <= 1;
+                end
+                default: begin
+                    $display("    %s %h, %h",
+                            alu2OpName(instrH),
+                            third, second);
+                    dstRegister <= r8(third);
+                    aluA <= readRegister8(r8(third));
+                    //TODO
+                    aluB <= readRegister8(r8(second));
+                    state <= STATE_ALU2_OP;
+                end
+                endcase
+            end
             4'h6: begin
                 case (instrH)
                 4'b100x,
