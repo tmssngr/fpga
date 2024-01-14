@@ -1,9 +1,5 @@
 // srp #10
-    @(negedge clk);
-        `assertPc(0);
-    @(negedge clk);
-    @(negedge clk);
-    @(negedge clk);
+    repeat (4) @(negedge clk);
         `assertState(STATE_DECODE);
         `assertInstr('h31);
         `assertSecond('h10);
@@ -115,7 +111,6 @@
         `assertFlags('b0000_1100);
 
 // ld r1, #9
-        `assertPc(14);
     repeat (3) @(negedge clk);
         `assertState(STATE_DECODE);
         `assertInstr('h1C);
@@ -376,13 +371,13 @@
         // cz__ ____
         `assertFlags('b1100_0000);
 
-// jmp 0
+// jmp L0
     repeat (5) @(negedge clk);
         `assertState(STATE_DECODE);
         `assertInstr('h8D);
         `assertSecond('h00);
-        `assertThird('h00);
+        `assertThird('h0C);
     repeat (1) @(negedge clk);
-        `assertPc(0);
+        `assertPc('h000C);
 
     #3

@@ -1,21 +1,21 @@
 VCD info: dumpfile SoC.vcd opened for output.
 
-0000: read instruction
+000c: read instruction
   31
-0001: read 2nd byte
+000d: read 2nd byte
   31 10
     srp 10
 
-0002: read instruction
+000e: read instruction
   0c
-0003: read 2nd byte
+000f: read 2nd byte
   0c 09
     ld r0, #09
     reg[10] = 09
 
-0004: read instruction
+0010: read instruction
   20
-0005: read 2nd byte
+0011: read 2nd byte
   20 10
     inc 10
     alu:    09       00    =>    0a
@@ -23,9 +23,9 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0000_0000
     reg[10] = 0a
 
-0006: read instruction
+0012: read instruction
   00
-0007: read 2nd byte
+0013: read 2nd byte
   00 10
     dec 10
     alu:    0a       00    =>    09
@@ -33,16 +33,16 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0000_0000
     reg[10] = 09
 
-0008: read instruction
+0014: read instruction
   0c
-0009: read 2nd byte
+0015: read 2nd byte
   0c 7f
     ld r0, #7f
     reg[10] = 7f
 
-000a: read instruction
+0016: read instruction
   20
-000b: read 2nd byte
+0017: read 2nd byte
   20 10
     inc 10
     alu:    7f       00    =>    80
@@ -50,9 +50,9 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0011_0000
     reg[10] = 80
 
-000c: read instruction
+0018: read instruction
   00
-000d: read 2nd byte
+0019: read 2nd byte
   00 10
     dec 10
     alu:    80       00    =>    7f
@@ -60,16 +60,16 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0001_0000
     reg[10] = 7f
 
-000e: read instruction
+001a: read instruction
   0c
-000f: read 2nd byte
+001b: read 2nd byte
   0c fe
     ld r0, #fe
     reg[10] = fe
 
-0010: read instruction
+001c: read instruction
   20
-0011: read 2nd byte
+001d: read 2nd byte
   20 10
     inc 10
     alu:    fe       00    =>    ff
@@ -77,9 +77,9 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0010_0000
     reg[10] = ff
 
-0012: read instruction
+001e: read instruction
   20
-0013: read 2nd byte
+001f: read 2nd byte
   20 10
     inc 10
     alu:    ff       00    =>    00
@@ -87,9 +87,9 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0100_0000
     reg[10] = 00
 
-0014: read instruction
+0020: read instruction
   00
-0015: read 2nd byte
+0021: read 2nd byte
   00 10
     dec 10
     alu:    00       00    =>    ff
@@ -97,9 +97,9 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0010_0000
     reg[10] = ff
 
-0016: read instruction
+0022: read instruction
   00
-0017: read 2nd byte
+0023: read 2nd byte
   00 10
     dec 10
     alu:    ff       00    =>    fe
@@ -107,16 +107,16 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0010_0000
     reg[10] = fe
 
-0018: read instruction
+0024: read instruction
   1c
-0019: read 2nd byte
+0025: read 2nd byte
   1c 10
     ld r1, #10
     reg[11] = 10
 
-001a: read instruction
+0026: read instruction
   01
-001b: read 2nd byte
+0027: read 2nd byte
   01 e1
     dec @e1
     alu:    fe       00    =>    fd
@@ -124,13 +124,13 @@ VCD info: dumpfile SoC.vcd opened for output.
     flags = 0010_0000
     reg[10] = fd
 
-001c: read instruction
+0028: read instruction
   8d
-001d: read 2nd byte
+0029: read 2nd byte
   8d 00
-001e: read 3rd byte
-  8d 00 00
-    jmp    , 0000
+002a: read 3rd byte
+  8d 00 0c
+    jmp    , 000c
 
-0000: read instruction
+000c: read instruction
 testSoC: SUCCESS

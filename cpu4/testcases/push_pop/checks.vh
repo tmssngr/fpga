@@ -1,6 +1,5 @@
-// srp #10
     @(negedge clk);
-        `assertPc(0);
+// srp #10
     repeat (3) @(negedge clk);
         `assertInstr('h31);
         `assertSecond('h20);
@@ -104,11 +103,12 @@
 
 // jmp 0
     repeat (5) @(negedge clk);
-        `assertState(STATE_DECODE);
         `assertInstr('h8D);
         `assertSecond('h00);
-        `assertThird('h00);
-    repeat (1) @(negedge clk);
-        `assertPc(0);
+        `assertThird('h0C);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+        `assertPc('h000C);
 
     #3

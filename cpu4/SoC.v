@@ -31,7 +31,7 @@ module Processor(
 
     reg [15:0] pc, sp, addr;
     initial begin
-        pc = 0;
+        pc = 'hC;
         sp = 0;
     end
 

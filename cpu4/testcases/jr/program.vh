@@ -1,4 +1,6 @@
 initial begin
+      default_interrupt_vectors();
+
 // L0:
       asm_jr(JC_NEVER, 8'hFE); // 0B ..
 

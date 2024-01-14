@@ -1,10 +1,9 @@
 // ld 10, #1
-    @(negedge clk);
-        `assertPc(0);
-    repeat (5) @(negedge clk);
+    repeat (6) @(negedge clk);
         `assertInstr('hE6);
         `assertSecond('h10);
         `assertThird('h01);
+        `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 0);
@@ -13,11 +12,11 @@
         `assertFlags('b0000_0000);
 
 // ld 11, #2
-        `assertPc(3);
     repeat (5) @(negedge clk);
         `assertInstr('hE6);
         `assertSecond('h11);
         `assertThird('h02);
+        `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 0);
@@ -27,10 +26,10 @@
         `assertFlags('b0000_0000);
 
 // incw 10
-        `assertPc(6);
     repeat (3) @(negedge clk);
         `assertInstr('hA0);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
@@ -48,10 +47,10 @@
         `assertFlags('b0000_0000);
 
 // decw 10
-        `assertPc(8);
     repeat (3) @(negedge clk);
         `assertInstr('h80);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
@@ -69,7 +68,6 @@
         `assertFlags('b0000_0000);
 
 // ld 11, #7F
-        `assertPc(10);
     repeat (5) @(negedge clk);
         `assertInstr('hE6);
         `assertSecond('h11);
@@ -83,10 +81,10 @@
         `assertFlags('b0000_0000);
 
 // incw 10
-        `assertPc(13);
     repeat (3) @(negedge clk);
         `assertInstr('hA0);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
@@ -105,10 +103,10 @@
         `assertFlags('b0000_0000);
 
 // decw 10
-        `assertPc(15);
     repeat (3) @(negedge clk);
         `assertInstr('h80);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
@@ -127,11 +125,11 @@
         `assertFlags('b0000_0000);
 
 // ld 11, #FF
-        `assertPc(17);
     repeat (5) @(negedge clk);
         `assertInstr('hE6);
         `assertSecond('h11);
         `assertThird('hFF);
+        `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 0);
@@ -140,10 +138,10 @@
         `assertRegister('h11, 'hFF);
 
 // incw 10
-        `assertPc(20);
     repeat (3) @(negedge clk);
         `assertInstr('hA0);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
@@ -162,10 +160,10 @@
         `assertFlags('b0000_0000);
 
 // decw 10
-        `assertPc(22);
     repeat (3) @(negedge clk);
         `assertInstr('h80);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
@@ -184,11 +182,11 @@
         `assertFlags('b0000_0000);
 
 // ld 10, #FF
-        `assertPc(24);
     repeat (5) @(negedge clk);
         `assertInstr('hE6);
         `assertSecond('h10);
         `assertThird('hFF);
+        `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 0);
@@ -197,10 +195,10 @@
         `assertRegister('h11, 'hFF);
 
 // incw 10
-        `assertPc(27);
     repeat (3) @(negedge clk);
         `assertInstr('hA0);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
@@ -219,10 +217,10 @@
         `assertFlags('b0100_0000);
 
 // incw 10
-        `assertPc(29);
     repeat (3) @(negedge clk);
         `assertInstr('hA0);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
@@ -240,10 +238,10 @@
         `assertFlags('b0000_0000);
 
 // decw 10
-        `assertPc(31);
     repeat (3) @(negedge clk);
         `assertInstr('h80);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
@@ -261,10 +259,10 @@
         `assertFlags('b0100_0000);
 
 // decw 10
-        `assertPc(33);
     repeat (3) @(negedge clk);
         `assertInstr('h80);
         `assertSecond('h10);
+        `assertState(STATE_DECODE);
         // lower byte:
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
@@ -287,8 +285,8 @@
     repeat (5) @(negedge clk);
         `assertInstr('h8D);
         `assertSecond('h00);
-        `assertThird('h00);
+        `assertThird('h0C);
     repeat (1) @(negedge clk);
-        `assertPc(0);
+        `assertPc('h000C);
 
     #3

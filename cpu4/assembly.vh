@@ -38,6 +38,17 @@ task asm3;
     end
 endtask
 
+task default_interrupt_vectors;
+	begin
+		asm2('h80, 0);
+		asm2('h80, 3);
+		asm2('h80, 6);
+		asm2('h80, 9);
+		asm2('h80, 'hC);
+		asm2('h80, 'hF);
+	end
+endtask
+
 task asm_nop;
     begin
         asm1('hFF);

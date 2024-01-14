@@ -1,28 +1,28 @@
 VCD info: dumpfile SoC.vcd opened for output.
 
-0000: read instruction
+000c: read instruction
   df
     scf
 
-0001: read instruction
+000d: read instruction
   cf
     rcf
 
-0002: read instruction
+000e: read instruction
   ef
     ccf
 
-0003: read instruction
+000f: read instruction
   ef
     ccf
 
-0004: read instruction
+0010: read instruction
   8d
-0005: read 2nd byte
+0011: read 2nd byte
   8d 00
-0006: read 3rd byte
-  8d 00 00
-    jmp    , 0000
+0012: read 3rd byte
+  8d 00 0c
+    jmp    , 000c
 
-0000: read instruction
+000c: read instruction
 testSoC: SUCCESS

@@ -1,5 +1,6 @@
-localparam L0_ = 16'h0;
+localparam L0_ = 16'h0C;
 initial begin
+      default_interrupt_vectors();
     label(L0_);
       asm_ld_R_IM(8'h10, 1);
       asm_ld_R_IM(8'h11, 2);

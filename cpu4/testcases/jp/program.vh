@@ -1,6 +1,8 @@
-localparam L0_ = 16'h0;
-localparam L1_ = 16'h5;
+localparam L0_ = 16'h0C;
+localparam L1_ = 16'h11;
 initial begin
+      default_interrupt_vectors();
+
     label(L0_);
       asm_jp(JC_NEVER, 16'hFFFE); // 0D FF FE
 

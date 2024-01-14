@@ -1,47 +1,57 @@
 // jr never, 0
     @(negedge clk);
-        `assertPc(0);
-    @(negedge clk);
-        `assertPc(1);
+    repeat (3) @(negedge clk);
         `assertInstr('h0B);
-    repeat (2) @(negedge clk);
-        `assertPc(2);
         `assertSecond('hFE);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+        `assertPc('h000E);
+    @(negedge clk);
 
 // ld r0, #3
     repeat (3) @(negedge clk);
-        `assertPc(3);
         `assertInstr('h0C);
-    repeat (2) @(negedge clk);
-        `assertPc(4);
         `assertSecond('h03);
-    repeat (3) @(negedge clk);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+        `assertPc('h0010);
+    @(negedge clk);
         `assertRegister(0, 'h03);
 
-// 4: add r0, r1
-        `assertPc(5);
-    repeat (4) @(negedge clk);
+// L1: add 0, #ff
+    repeat (5) @(negedge clk);
         `assertInstr('h06);
         `assertSecond('h00);
         `assertThird('hFF);
-    repeat (3) @(negedge clk);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
         `assertRegister(0, 'h02);
         // ch
         `assertFlags('b1000_0100);
 
 // jr nz, L1
-    repeat (2) @(negedge clk);
+    repeat (3) @(negedge clk);
         `assertInstr('hEB);
         `assertSecond('hFB);
-    repeat (1) @(negedge clk);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+        `assertPc('h0010);
+    @(negedge clk);
 
-// 4: add r0, r1
-        `assertPc(4);
-    repeat (6) @(negedge clk);
+// L1: add 0, #ff
+    repeat (5) @(negedge clk);
         `assertInstr('h06);
         `assertSecond('h00);
         `assertThird('hFF);
-    repeat (2) @(negedge clk);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
         `assertRegister(0, 'h01);
         // ch
         `assertFlags('b1000_0100);
@@ -50,15 +60,21 @@
     repeat (3) @(negedge clk);
         `assertInstr('hEB);
         `assertSecond('hFB);
-    repeat (1) @(negedge clk);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+        `assertPc('h0010);
+    @(negedge clk);
 
-// 4: add r0, r1
-        `assertPc(4);
-    repeat (6) @(negedge clk);
+// L1: add 0, #ff
+    repeat (5) @(negedge clk);
         `assertInstr('h06);
         `assertSecond('h00);
         `assertThird('hFF);
-    repeat (2) @(negedge clk);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
         `assertRegister(0, 'h00);
         // czh
         `assertFlags('b1100_0100);
@@ -67,13 +83,19 @@
     repeat (3) @(negedge clk);
         `assertInstr('hEB);
         `assertSecond('hFB);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+        `assertPc('h0015);
+    @(negedge clk);
 
-// jr 0
-        `assertPc(9);
-    repeat (5) @(negedge clk);
+// jr L0
+    repeat (3) @(negedge clk);
         `assertInstr('h8B);
         `assertSecond('hF5);
+        `assertState(STATE_DECODE);
     @(negedge clk);
-        `assertPc(0);
+        `assertState(STATE_FETCH_INSTR);
+        `assertPc('h000C);
 
     #3
