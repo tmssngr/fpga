@@ -407,15 +407,11 @@ module Processor(
                     $display("    %s r%h, r%h",
                             alu2OpName(instrH),
                             secondH, secondL);
-                    aluMode <= alu2OpCode(instrH);
-                    writeRegister <= (instrH[3:2] == 2'b00)     // add, adc, sub, sbc
-                                    | (instrH[3:1] == 3'b010)   // or, and
-                                    | (instrH      == 4'b1011); // xor
-                    writeFlags <= 1;
                     dstRegister <= r4(secondH);
                     aluA <= readRegister4(secondH);
                     //TODO
                     aluB <= readRegister4(secondL);
+                    state <= STATE_ALU2_OP;
                 end
                 endcase
             end
@@ -441,14 +437,10 @@ module Processor(
                     $display("    %s %h, #%h",
                             alu2OpName(instrH),
                             second, third);
-                    aluMode <= alu2OpCode(instrH);
-                    writeRegister <= (instrH[3:2] == 2'b00)     // add, adc, sub, sbc
-                                    | (instrH[3:1] == 3'b010)   // or, and
-                                    | (instrH      == 4'b1011); // xor
-                    writeFlags <= 1;
                     dstRegister <= r8(second);
                     aluA <= readRegister8(r8(second));
                     aluB <= third;
+                    state <= STATE_ALU2_OP;
                 end
                 endcase
             end
@@ -561,6 +553,15 @@ module Processor(
             writeRegister <= 1;
             writeFlags <= 1;
             dstRegister <= srcRegister;
+            state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_ALU2_OP: begin
+            aluMode <= alu2OpCode(instrH);
+            writeRegister <= (instrH[3:2] == 2'b00)     // add, adc, sub, sbc
+                            | (instrH[3:1] == 3'b010)   // or, and
+                            | (instrH      == 4'b1011); // xor
+            writeFlags <= 1;
             state <= STATE_FETCH_INSTR;
         end
 

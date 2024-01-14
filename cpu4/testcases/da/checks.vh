@@ -35,6 +35,8 @@
         `assertInstr('h02);
         `assertSecond('h01);
     @(negedge clk);
+        `assertState(STATE_ALU2_OP);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'h0A);
@@ -74,6 +76,8 @@
         `assertState(STATE_DECODE);
         `assertInstr('h22);
         `assertSecond('h01);
+    @(negedge clk);
+        `assertState(STATE_ALU2_OP);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -127,6 +131,8 @@
         `assertInstr('h02);
         `assertSecond('h01);
     @(negedge clk);
+        `assertState(STATE_ALU2_OP);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'h12);
@@ -157,6 +163,8 @@
         `assertState(STATE_DECODE);
         `assertInstr('h22);
         `assertSecond('h01);
+    @(negedge clk);
+        `assertState(STATE_ALU2_OP);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -209,6 +217,8 @@
         `assertInstr('h02);
         `assertSecond('h01);
     @(negedge clk);
+        `assertState(STATE_ALU2_OP);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'h9C);
@@ -240,8 +250,9 @@
         `assertInstr('h22);
         `assertSecond('h01);
     @(negedge clk);
-        `assertState(STATE_FETCH_INSTR);
+        `assertState(STATE_ALU2_OP);
     @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h10, 'h7B);
         `assertRegister('h11, 'h87);
@@ -249,7 +260,7 @@
         `assertFlags('b1000_1100);
 
 // da 10
-    repeat (2) @(negedge clk);
+    repeat (3) @(negedge clk);
         `assertInstr('h40);
         `assertSecond('h10);
         `assertState(STATE_DECODE);
@@ -304,6 +315,8 @@
         `assertInstr('h22);
         `assertSecond('h01);
     @(negedge clk);
+        `assertState(STATE_ALU2_OP);
+    @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
     @(negedge clk);
@@ -346,6 +359,8 @@
         `assertState(STATE_DECODE);
         `assertInstr('h02);
         `assertSecond('h01);
+    @(negedge clk);
+        `assertState(STATE_ALU2_OP);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
