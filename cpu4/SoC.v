@@ -368,42 +368,58 @@ module Processor(
                 end
                 endcase
             end
-            4'h2,
-            4'h6: begin
-                case (instrH)
-                4'h0,
-                4'h1,
-                4'h2,
-                4'h3,
-                4'h4,
-                4'h5,
-                4'h6,
-                4'h7,
-                4'hA,
-                4'hB: begin
+            4'h2: begin
+                casez (instrH)
+                4'h8: begin
+                    $display("    lde r%h, Irr%h",
+                            secondH, secondL);
+                    //TODO
+                end
+                4'h9: begin
+                    $display("    lde Irr%h, r%h",
+                            secondL, secondH);
+                    //TODO
+                end
+                4'hC: begin
+                    $display("    ldc r%h, Irr%h",
+                            secondH, secondL);
+                    //TODO
+                end
+                4'hD: begin
+                    $display("    ldc Irr%h, r%h",
+                            secondL, secondH);
+                    //TODO
+                end
+                4'b111x: begin
+                    $display("    ? %h",
+                            second);
+                end
+                default: begin
+                    $display("    %s r%h, r%h",
+                            alu2OpName(instrH),
+                            secondH, secondL);
                     aluMode <= alu2OpCode(instrH);
                     writeRegister <= (instrH[3:2] == 2'b00)     // add, adc, sub, sbc
                                     | (instrH[3:1] == 3'b010)   // or, and
                                     | (instrH      == 4'b1011); // xor
                     writeFlags <= 1;
-                    case (instrL)
-                    4'h2: begin
-                        $display("    %s r%h, r%h",
-                                alu2OpName(instrH),
-                                secondH, secondL);
-                        dstRegister <= r4(secondH);
-                        aluA <= readRegister4(secondH);
-                        aluB <= readRegister4(secondL);
-                    end
-                    4'h6: begin
-                        $display("    %s %h, #%h",
-                                alu2OpName(instrH),
-                                second, third);
-                        dstRegister <= r8(second);
-                        aluA <= readRegister8(r8(second));
-                        aluB <= third;
-                    end
-                    endcase
+                    dstRegister <= r4(secondH);
+                    aluA <= readRegister4(secondH);
+                    //TODO
+                    aluB <= readRegister4(secondL);
+                end
+                endcase
+            end
+            4'h6: begin
+                case (instrH)
+                4'b100x,
+                4'b1100,
+                4'b1111: begin
+                    $display("    ? %h", instruction);
+                end
+                4'hD: begin
+                    $display("    call %h", directAddress);
+                    //TODO
                 end
                 4'hE: begin
                     $display("    ld %h, #%h", second, third);
@@ -413,7 +429,17 @@ module Processor(
                     writeRegister <= 1;
                 end
                 default: begin
-                    $display("    ?", instruction);
+                    $display("    %s %h, #%h",
+                            alu2OpName(instrH),
+                            second, third);
+                    aluMode <= alu2OpCode(instrH);
+                    writeRegister <= (instrH[3:2] == 2'b00)     // add, adc, sub, sbc
+                                    | (instrH[3:1] == 3'b010)   // or, and
+                                    | (instrH      == 4'b1011); // xor
+                    writeFlags <= 1;
+                    dstRegister <= r8(second);
+                    aluA <= readRegister8(r8(second));
+                    aluB <= third;
                 end
                 endcase
             end
