@@ -105,7 +105,8 @@ module Alu(
             outFlags[FLAG_INDEX_H] = cL;
             { cH, out[7:4] } = { 1'b0, a[7:4] } - { 1'b0, b[7:4] } - { 4'b0000, cL };
             outFlags[FLAG_INDEX_C] = cH;
-            outFlags[FLAG_INDEX_D] = 1;
+            // keep D vor CP
+            outFlags[FLAG_INDEX_D] = flags[FLAG_INDEX_D] | ~mode[3];
             outFlags[FLAG_INDEX_V] = (a[7] == b[7]) & (a[7] != out[7]);
         end
         ALU2_OR: begin
