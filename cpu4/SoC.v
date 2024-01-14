@@ -56,6 +56,13 @@ module Processor(
 
     reg [3:0] rp = 0;
     reg [7:0] registers[0:'h7F];
+    reg [7:0] p01m = 8'b01_0_01_1_01;
+    //                  || | || | ++ P00-P03 Mode: 00 output, 01 input, 1x address A8-A11
+    //                  || | || +--- Stack: 0 external,  1 internal
+    //                  || | ++----- P1 Mode: 00 Output, 01 Input, 10 AD0-AD7, 11 tristate
+    //                  || +-------- Memory timing: 0 normal, 1 extended
+    //                  ++---------- P04-P07 Mode: 00 output, 01 input, 1x A12-A15 
+    wire stackInternal = p01m[2];
 
     reg [7:0] srcRegister;
     reg [7:0] dstRegister;
@@ -98,6 +105,7 @@ module Processor(
     );
         casez (r)
         8'b0???_????: readRegister8 = registers[r[6:0]];
+        8'hF8:        readRegister8 = p01m;
         8'hFC:        readRegister8 = flags;
         8'hFD:        readRegister8 = { rp, 4'h0 };
         8'hFE:        readRegister8 = sp[15:8];
@@ -238,6 +246,7 @@ module Processor(
             $display("    reg[%h] = %h", dstRegister, aluOut);
             casez (dstRegister)
             8'b0???_????: registers[dstRegister] <= aluOut;
+            8'hF8:        p01m                   <= aluOut;
             8'hFC:        flags                  <= aluOut;
             8'hFD:        rp                     <= aluOut[7:4];
             8'hFE:        sp[15:8]               <= aluOut;
