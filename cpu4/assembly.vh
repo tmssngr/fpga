@@ -169,6 +169,14 @@ task asm_tm_r_r;
     end
 endtask
 
+task asm_tm_R_IM;
+    input [7:0] dst;
+    input [7:0] src;
+    begin
+        asm3(8'h76, dst, src);
+    end
+endtask
+
 task asm_cp_r_r;
     input [3:0] dst;
     input [3:0] src;
@@ -317,4 +325,19 @@ task asm_pop;
     begin
         asm2(8'h50, dst);
     end
+endtask
+
+task asm_ldc_r_Irr;
+	input [3:0] dst;
+	input [3:0] src;
+	begin
+		asm2(8'hC2, { dst, src});
+	end
+endtask
+task asm_ldc_Irr_r;
+	input [3:0] dst;
+	input [3:0] src;
+	begin
+		asm2(8'hD2, { dst, src});
+	end
 endtask
