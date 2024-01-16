@@ -470,9 +470,9 @@ module Processor(
                     //TODO
                 end
                 4'hE: begin
-                    $display("    ld %h, %h", second, third);
-                    dstRegister <= r8(second);
-                    aluA <= readRegister8(third);
+                    $display("    ld %h, %h", third, second);
+                    dstRegister <= r8(third);
+                    aluA <= readRegister8(r8(second));
                     aluMode <= ALU1_LD;
                     writeRegister <= 1;
                 end

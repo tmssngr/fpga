@@ -6,6 +6,7 @@ call C:\oss-cad-suite\environment.bat
 :repeat
 cls
 call :simulate Alu
+call :test ld
 call :test add
 call :test cp
 call :test jp

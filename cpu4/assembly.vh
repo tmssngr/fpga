@@ -80,7 +80,6 @@ task asm_ld;
         asm2({dst, 4'h8}, {4'hE, src});
     end
 endtask
-
 task asm_ld_r_IM;
     input [3:0] dst;
     input [7:0] src;
@@ -88,12 +87,18 @@ task asm_ld_r_IM;
         asm2({dst, 4'hC}, src);
     end
 endtask
-
 task asm_ld_R_IM;
     input [7:0] dst;
     input [7:0] src;
     begin
         asm3(8'hE6, dst, src);
+    end
+endtask
+task asm_ld_R_R;
+    input [7:0] dst;
+    input [7:0] src;
+    begin
+        asm3(8'hE4, src, dst);
     end
 endtask
 
