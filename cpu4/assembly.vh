@@ -109,7 +109,13 @@ task asm_add_r_r;
         asm2(8'h02, {dst, src});
     end
 endtask
-
+task asm_add_R_R;
+    input [7:0] dst;
+    input [7:0] src;
+    begin
+        asm3(8'h04, src, dst);
+    end
+endtask
 task asm_add_R_IM;
     input [7:0] dst;
     input [7:0] src;

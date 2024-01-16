@@ -111,19 +111,22 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
+        `assertRegister('h20, 'h90);
         `assertRegister('h21, 'h70);
 
-// add r0, r1
-    repeat (3) @(negedge clk);
-        `assertInstr('h02);
-        `assertSecond('h01);
+// add R0, R1
+    repeat (5) @(negedge clk);
         `assertState(STATE_DECODE);
+        `assertInstr('h04);
+        `assertSecond('hE1);
+        `assertThird('hE0);
     @(negedge clk);
         `assertState(STATE_ALU2_OP);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
         `assertRegister('h20, 'h00);
+        `assertRegister('h21, 'h70);
         // cz
         `assertFlags('b1100_0000);
 

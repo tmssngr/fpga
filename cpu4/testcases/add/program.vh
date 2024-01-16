@@ -16,7 +16,7 @@ initial begin
       asm_add_r_r(0, 1);
 
       asm_ld_r_IM(1, 'h70);
-      asm_add_r_r(0, 1);
+      asm_add_R_R('hE0, 'hE1);
 
       asm_ld_r_IM(0, -1);
       asm_ld_r_IM(1, -1);
