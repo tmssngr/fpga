@@ -4,6 +4,7 @@ initial begin
       default_interrupt_vectors();
 
     label(L0_);
+      asm_srp('h20);
       asm_ld_r_IM(0, 9);
       asm_ld_r_IM(1, 1);
       asm_add_r_r(0, 1);

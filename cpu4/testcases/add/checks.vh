@@ -1,16 +1,24 @@
-// ld r0, #9
     @(negedge clk);
-        `assertPc(12);
-        `assertState(STATE_READ_INSTR);
+// srp #20
+    repeat (3) @(negedge clk);
+        `assertInstr('h31);
+        `assertSecond('h20);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assert(uut.proc.rp, 'h2);
+
+// ld r0, #9
     repeat (3) @(negedge clk);
         `assertInstr('h0C);
         `assertSecond('h09);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h00);
+        `assert(uut.proc.dstRegister, 'h20);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(0, 'h09);
+        `assertRegister('h20, 'h09);
 
 // ld r1, #1
     repeat (3) @(negedge clk);
@@ -18,10 +26,10 @@
         `assertSecond('h01);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h01);
+        `assert(uut.proc.dstRegister, 'h21);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(1, 'h01);
+        `assertRegister('h21, 'h01);
 
 // add r0, r1
     repeat (3) @(negedge clk);
@@ -31,14 +39,14 @@
     @(negedge clk);
         `assertState(STATE_ALU2_OP);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h00);
+        `assert(uut.proc.dstRegister, 'h20);
         `assert(uut.proc.aluMode, ALU2_ADD);
         `assert(uut.proc.aluA, 'h09);
         `assert(uut.proc.aluB, 'h01);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(0, 'h0A);
-        `assertRegister(1, 'h01);
+        `assertRegister('h20, 'h0A);
+        `assertRegister('h21, 'h01);
         `assertFlags('b0000_0000);
 
 // ld r1, #6
@@ -47,10 +55,10 @@
         `assertSecond('h06);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h01);
+        `assert(uut.proc.dstRegister, 'h21);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(1, 'h06);
+        `assertRegister('h21, 'h06);
 
 // add r0, r1
     repeat (3) @(negedge clk);
@@ -60,14 +68,14 @@
     @(negedge clk);
         `assertState(STATE_ALU2_OP);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h00);
+        `assert(uut.proc.dstRegister, 'h20);
         `assert(uut.proc.aluMode, ALU2_ADD);
         `assert(uut.proc.aluA, 'h0A);
         `assert(uut.proc.aluB, 'h06);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(0, 'h10);
-        `assertRegister(1, 'h06);
+        `assertRegister('h20, 'h10);
+        `assertRegister('h21, 'h06);
         // h
         `assertFlags('b0000_0100);
 
@@ -79,7 +87,7 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(1, 'h80);
+        `assertRegister('h21, 'h80);
 
 // add r0, r1
     repeat (3) @(negedge clk);
@@ -91,7 +99,7 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(0, 'h90);
+        `assertRegister('h20, 'h90);
         // s
         `assertFlags('b0010_0000);
 
@@ -103,7 +111,7 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(1, 'h70);
+        `assertRegister('h21, 'h70);
 
 // add r0, r1
     repeat (3) @(negedge clk);
@@ -115,7 +123,7 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(0, 'h00);
+        `assertRegister('h20, 'h00);
         // cz
         `assertFlags('b1100_0000);
 
@@ -127,7 +135,7 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(0, 'hFF);
+        `assertRegister('h20, 'hFF);
 
 // ld r1, #FF
     repeat (3) @(negedge clk);
@@ -137,7 +145,7 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(1, 'hFF);
+        `assertRegister('h21, 'hFF);
 
 // add r1, r0
     repeat (3) @(negedge clk);
@@ -149,8 +157,8 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRegister(0, 'hFF);
-        `assertRegister(1, 'hFE);
+        `assertRegister('h20, 'hFF);
+        `assertRegister('h21, 'hFE);
         // csh
         `assertFlags('b1010_0100);
 
