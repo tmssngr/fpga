@@ -384,32 +384,31 @@ module Processor(
                 casez (instrH)
                 4'h8: begin
                     $display("    lde r%h, Irr%h",
-                            secondH, secondL);
+                             secondH, secondL);
                     //TODO
                 end
                 4'h9: begin
                     $display("    lde Irr%h, r%h",
-                            secondL, secondH);
+                             secondL, secondH);
                     //TODO
                 end
                 4'hC: begin
                     $display("    ldc r%h, Irr%h",
-                            secondH, secondL);
+                             secondH, secondL);
                     //TODO
                 end
                 4'hD: begin
                     $display("    ldc Irr%h, r%h",
-                            secondL, secondH);
+                             secondL, secondH);
                     //TODO
                 end
                 4'b111x: begin
-                    $display("    ? %h",
-                            second);
+                    $display("    ? %h", second);
                 end
                 default: begin
                     $display("    %s r%h, r%h",
-                            alu2OpName(instrH),
-                            secondH, secondL);
+                             alu2OpName(instrH),
+                             secondH, secondL);
                     dstRegister <= r4(secondH);
                     aluA <= readRegister4(secondH);
                     //TODO
@@ -422,38 +421,38 @@ module Processor(
                 casez (instrH)
                 4'h8: begin
                     $display("    ldei r%h, Irr%h",
-                            secondH, secondL);
+                             secondH, secondL);
                     //TODO
                 end
                 4'h9: begin
                     $display("    ldei Irr%h, r%h",
-                            secondL, secondH);
+                             secondL, secondH);
                     //TODO
                 end
                 4'hC: begin
                     $display("    ldci r%h, Irr%h",
-                            secondH, secondL);
+                             secondH, secondL);
                     //TODO
                 end
                 4'hD: begin
                     $display("    ldci Irr%h, r%h",
-                            secondL, secondH);
+                             secondL, secondH);
                     //TODO
                 end
                 4'hE: begin
                     $display("    ld r%h, Ir%h",
-                            secondL, secondH);
+                             secondL, secondH);
                     //TODO
                 end
                 4'hF: begin
                     $display("    ld Ir%h, r%h",
-                            secondL, secondH);
+                             secondL, secondH);
                     //TODO
                 end
                 default: begin
                     $display("    %s r%h, Ir%h",
-                            alu2OpName(instrH),
-                            secondH, secondL);
+                             alu2OpName(instrH),
+                             secondH, secondL);
                     dstRegister <= r4(secondH);
                     aluA <= readRegister4(secondH);
                     srcRegister <= readRegister4(secondL);
@@ -481,8 +480,8 @@ module Processor(
                 end
                 default: begin
                     $display("    %s %h, %h",
-                            alu2OpName(instrH),
-                            third, second);
+                             alu2OpName(instrH),
+                             third, second);
                     dstRegister <= r8(third);
                     aluA <= readRegister8(r8(third));
                     //TODO
@@ -511,8 +510,8 @@ module Processor(
                 end
                 default: begin
                     $display("    %s %h, #%h",
-                            alu2OpName(instrH),
-                            second, third);
+                             alu2OpName(instrH),
+                             second, third);
                     dstRegister <= r8(second);
                     aluA <= readRegister8(r8(second));
                     aluB <= third;
