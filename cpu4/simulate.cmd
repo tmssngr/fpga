@@ -15,6 +15,7 @@ call :test add
 call :test cp
 call :test jp
 call :test jr
+call :test djnz
 call :test push_pop
 
 pause

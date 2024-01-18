@@ -224,7 +224,9 @@ module Processor(
                          ? pc + 1
                          : ( state == STATE_DECODE & isJumpDA & takeBranch) 
                             ? directAddress
-                            : ( state == STATE_DECODE & isJumpRel & takeBranch) 
+                            : ( (state == STATE_DECODE & isJumpRel & takeBranch)
+                              || (state == STATE_DJNZ2 && flagsOut[FLAG_INDEX_Z] == 1'b0 )
+                              ) 
                                 ? pc + { {8{second[7]}}, second }
                                 : pc;
     assign memAddr =   state < STATE_DECODE
@@ -529,8 +531,9 @@ module Processor(
                 //TODO
             end
             4'hA: begin
-                $display("    djnz r%h, %h", instrH, secondL);
-                //TODO
+                $display("    djnz r%h, %h", instrH, second);
+                dstRegister <= r4(instrH);
+                state <= STATE_DJNZ1;
             end
             4'hB: begin
                 $display("    jr %s, %h", ccName(instrH), second);
@@ -656,6 +659,17 @@ module Processor(
             sp <= sp + 1;
             dstRegister <= srcRegister;
             writeRegister <= 1;
+            state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_DJNZ1: begin
+            aluA <= readRegister8(dstRegister);
+            aluMode <= ALU1_DEC;
+            writeRegister <= 1;
+        end
+
+        STATE_DJNZ2: begin
+            // needs a special state to handle the pc
             state <= STATE_FETCH_INSTR;
         end
 

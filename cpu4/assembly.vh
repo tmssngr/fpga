@@ -242,6 +242,13 @@ task asm_jp;
         asm3({ condition, 4'hD }, addr[15:8], addr[7:0]);
     end
 endtask
+task asm_djnz;
+    input [3:0] dst;
+    input [7:0] addr;
+    begin
+        asm2({ dst, 4'hA }, addr);
+    end
+endtask
 
 task asm_srp;
     input [7:0] dst;

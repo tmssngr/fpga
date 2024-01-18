@@ -12,3 +12,5 @@ localparam STATE_ALU2_IR      = 10;
 localparam STATE_ALU2_OP      = 11;
 localparam STATE_PUSH         = 12;
 localparam STATE_POP          = 13;
+localparam STATE_DJNZ1        = 14;
+localparam STATE_DJNZ2        = 15;
