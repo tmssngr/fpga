@@ -216,7 +216,7 @@ module Processor(
     endfunction
 
     `include "states.vh"
-    reg [3:0] state = STATE_FETCH_INSTR;
+    reg [STATES_MAX_BIT:0] state = STATE_FETCH_INSTR;
 
     wire [15:0] nextRelativePc = pc + { {8{second[7]}}, second };
     wire [15:0] nextPc = (  state == STATE_READ_INSTR

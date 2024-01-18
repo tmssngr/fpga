@@ -1,3 +1,4 @@
+localparam STATES_MAX_BIT = 4;
 localparam STATE_FETCH_INSTR  = 0;
 localparam STATE_READ_INSTR   = 1;
 localparam STATE_WAIT_2       = 2;
