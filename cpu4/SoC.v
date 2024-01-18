@@ -2,18 +2,26 @@
 
 module Memory(
     input clk,
-    input [15:0]     addr,
+    input    [15:0] addr,
+    input     [7:0] dataWrite,
     output reg[7:0] dataRead,
+    input           write,
     input           strobe
 );
 
-    reg [7:0] memory[0:255];
+    reg [7:0] memory[0:8191];
 `include "assembly.vh"
 `include "program.vh"
 
     always @(posedge clk) begin
         if (strobe) begin
-            dataRead <= memory[addr];
+            if (write) begin
+                memory[addr] <= dataWrite;
+                dataRead <= dataWrite;
+            end
+            else begin
+                dataRead <= memory[addr];
+            end
         end
     end
 endmodule
@@ -25,6 +33,8 @@ module Processor(
     input         reset,
     output [15:0] memAddr,
     input  [7:0]  memDataRead,
+    output [7:0]  memDataWrite,
+    output        memWrite,
     output        memStrobe
 );
     `include "flags.vh"
@@ -230,12 +240,16 @@ module Processor(
                               ) 
                                 ? nextRelativePc
                                 : pc;
-    assign memAddr = state < STATE_DECODE
-                     ? pc : addr;
+    assign memAddr = (state == STATE_READ_MEM1)
+                   | (state == STATE_WRITE_MEM)
+                     ? addr : pc;
+    assign memDataWrite = aluA;
+    assign memWrite = (state == STATE_WRITE_MEM);
     assign memStrobe = (state == STATE_FETCH_INSTR)
                      | (state == STATE_WAIT_2 & ~isInstrSize1)
                      | (state == STATE_WAIT_3)
-                     | (state == STATE_READ_MEM1);
+                     | (state == STATE_READ_MEM1)
+                     | (state == STATE_WRITE_MEM);
 
     always @(posedge clk) begin
         if (writeFlags) begin
@@ -404,7 +418,10 @@ module Processor(
                 4'hD: begin
                     $display("    ldc Irr%h, r%h",
                              secondL, secondH);
-                    //TODO
+                    addr[15:8] <= readRegister4(secondL & ~1);
+                    dstRegister <= r4(secondL | 1);
+                    srcRegister <= r4(secondH);
+                    state <= STATE_LDC_WRITE1;
                 end
                 4'b111x: begin
                     $display("    ? %h", second);
@@ -679,6 +696,15 @@ module Processor(
 
         STATE_LDC_READ: begin
             addr[7:0] <= readRegister8(srcRegister);
+            state <= STATE_READ_MEM1;
+        end
+
+        STATE_LDC_WRITE1: begin
+            addr[7:0] <= readRegister8(dstRegister);
+        end
+        STATE_LDC_WRITE2: begin
+            aluA <= readRegister8(srcRegister);
+            state <= STATE_WRITE_MEM;
         end
 
         STATE_READ_MEM1: begin
@@ -687,6 +713,10 @@ module Processor(
             aluA <= memDataRead;
             aluMode <= ALU1_LD;
             writeRegister <= 1;
+            state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_WRITE_MEM: begin
             state <= STATE_FETCH_INSTR;
         end
 
@@ -700,20 +730,26 @@ module SoC(
     input clk
 );
     wire [15:0] memAddr;
-    wire [7:0]  memData;
+    wire [7:0]  memDataRead;
+    wire [7:0]  memDataWrite;
+    wire        memWrite;
     wire        memStrobe;
 
     Memory mem(
         .clk(clk),
         .addr(memAddr),
-        .dataRead(memData),
+        .dataRead(memDataRead),
+        .dataWrite(memDataWrite),
+        .write(memWrite),
         .strobe(memStrobe)
     );
 
     Processor proc(
         .clk(clk),
         .memAddr(memAddr),
-        .memDataRead(memData),
+        .memDataRead(memDataRead),
+        .memDataWrite(memDataWrite),
+        .memWrite(memWrite),
         .memStrobe(memStrobe)
     );
 endmodule
