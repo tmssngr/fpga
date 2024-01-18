@@ -40,12 +40,12 @@ endtask
 
 task default_interrupt_vectors;
 	begin
-		asm2('h80, 0);
-		asm2('h80, 3);
-		asm2('h80, 6);
-		asm2('h80, 9);
-		asm2('h80, 'hC);
-		asm2('h80, 'hF);
+		asm2('h8, 0);
+		asm2('h8, 3);
+		asm2('h8, 6);
+		asm2('h8, 9);
+		asm2('h8, 'hC);
+		asm2('h8, 'hF);
 	end
 endtask
 
