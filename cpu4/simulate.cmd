@@ -6,15 +6,15 @@ call C:\oss-cad-suite\environment.bat
 :repeat
 cls
 call :simulate Alu
+call :test Xcf
+call :test srp_inc_dec
 call :test ld
+call :test incw_decw
+call :test da
 call :test add
 call :test cp
 call :test jp
 call :test jr
-call :test Xcf
-call :test srp_inc_dec
-call :test incw_decw
-call :test da
 call :test push_pop
 
 pause
