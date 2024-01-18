@@ -218,7 +218,8 @@ module Processor(
     `include "states.vh"
     reg [3:0] state = STATE_FETCH_INSTR;
 
-    wire [7:0] nextPc = (  state == STATE_READ_INSTR
+    wire [15:0] nextRelativePc = pc + { {8{second[7]}}, second };
+    wire [15:0] nextPc = (  state == STATE_READ_INSTR
                          | state == STATE_READ_2
                          | state == STATE_READ_3)
                          ? pc + 1
@@ -227,7 +228,7 @@ module Processor(
                             : ( (state == STATE_DECODE & isJumpRel & takeBranch)
                               || (state == STATE_DJNZ2 && flagsOut[FLAG_INDEX_Z] == 1'b0 )
                               ) 
-                                ? pc + { {8{second[7]}}, second }
+                                ? nextRelativePc
                                 : pc;
     assign memAddr =   state < STATE_DECODE
                      ? pc : addr;
