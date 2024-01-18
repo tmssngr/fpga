@@ -9,6 +9,7 @@ call :simulate Alu
 call :test Xcf
 call :test srp_inc_dec
 call :test ld
+call :test ldc
 call :test incw_decw
 call :test da
 call :test add

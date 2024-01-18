@@ -15,3 +15,6 @@ localparam STATE_PUSH         = 12;
 localparam STATE_POP          = 13;
 localparam STATE_DJNZ1        = 14;
 localparam STATE_DJNZ2        = 15;
+localparam STATE_LDC_READ     = 16;
+localparam STATE_READ_MEM1    = 17;
+localparam STATE_READ_MEM2    = 18;

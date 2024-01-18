@@ -230,11 +230,12 @@ module Processor(
                               ) 
                                 ? nextRelativePc
                                 : pc;
-    assign memAddr =   state < STATE_DECODE
+    assign memAddr = state < STATE_DECODE
                      ? pc : addr;
     assign memStrobe = (state == STATE_FETCH_INSTR)
                      | (state == STATE_WAIT_2 & ~isInstrSize1)
-                     | (state == STATE_WAIT_3);
+                     | (state == STATE_WAIT_3)
+                     | (state == STATE_READ_MEM1);
 
     always @(posedge clk) begin
         if (writeFlags) begin
@@ -395,7 +396,10 @@ module Processor(
                 4'hC: begin
                     $display("    ldc r%h, Irr%h",
                              secondH, secondL);
-                    //TODO
+                    dstRegister <= r4(secondH);
+                    addr[15:8] <= readRegister4(secondL & ~1);
+                    srcRegister <= r4(secondL | 1);
+                    state <= STATE_LDC_READ;
                 end
                 4'hD: begin
                     $display("    ldc Irr%h, r%h",
@@ -670,6 +674,19 @@ module Processor(
 
         STATE_DJNZ2: begin
             // needs a special state to handle the pc
+            state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_LDC_READ: begin
+            addr[7:0] <= readRegister8(srcRegister);
+        end
+
+        STATE_READ_MEM1: begin
+        end
+        STATE_READ_MEM2: begin
+            aluA <= memDataRead;
+            aluMode <= ALU1_LD;
+            writeRegister <= 1;
             state <= STATE_FETCH_INSTR;
         end
 
