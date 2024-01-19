@@ -98,7 +98,7 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assert(uut.mem.memory['h812], 'h0F);
+        `assertRom(16'h812, 8'h0F);
         `assertRegister(8'h20, 'h08);
         `assertRegister(8'h21, 'h12);
         `assertRegister(8'h22, 'h0F);

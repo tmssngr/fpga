@@ -1,20 +1,21 @@
 `default_nettype none
 
-module Memory(
-    input clk,
-    input    [15:0] addr,
-    input     [7:0] dataWrite,
-    output reg[7:0] dataRead,
-    input           write,
-    input           strobe
+module Memory #(
+    parameter addrBusWidth = 8
+) (
+    input                      clk,
+    input [addrBusWidth - 1:0] addr,
+    input                [7:0] dataIn,
+    output            reg[7:0] dataOut,
+    input                      write,
+    input                      strobe
 );
-
-    localparam MEM_SIZE = 8192;
-    reg [7:0] memory[0 : MEM_SIZE - 1];
+    localparam size = 1 << addrBusWidth;
+    reg [7:0] memory[0 : size - 1];
 `ifdef BENCH
     integer i;
     initial begin
-        for (i = 0; i < MEM_SIZE; i = i + 1) begin
+        for (i = 0; i < size; i = i + 1) begin
             memory[i] = 8'h0;
         end
     end
@@ -26,11 +27,11 @@ module Memory(
     always @(posedge clk) begin
         if (strobe) begin
             if (write) begin
-                memory[addr] <= dataWrite;
-                dataRead <= dataWrite;
+                memory[addr] <= dataIn;
+                dataOut <= dataIn;
             end
             else begin
-                dataRead <= memory[addr];
+                dataOut <= memory[addr];
             end
         end
     end
@@ -745,11 +746,12 @@ module SoC(
     wire        memWrite;
     wire        memStrobe;
 
-    Memory mem(
+    // 8k
+    Memory #(.addrBusWidth(13)) rom(
         .clk(clk),
-        .addr(memAddr),
-        .dataRead(memDataRead),
-        .dataWrite(memDataWrite),
+        .addr(memAddr[12:0]),
+        .dataOut(memDataRead),
+        .dataIn(memDataWrite),
         .write(memWrite),
         .strobe(memStrobe)
     );
