@@ -741,20 +741,37 @@ module SoC(
     input clk
 );
     wire [15:0] memAddr;
-    wire [7:0]  memDataRead;
+    wire [7:0]  memDataRead, romRead, ramRead;
     wire [7:0]  memDataWrite;
     wire        memWrite;
-    wire        memStrobe;
+    wire        memStrobe, romStrobe, ramStrobe;
+    wire        romEnable, ramEnable;
 
     // 8k
     Memory #(.addrBusWidth(13)) rom(
         .clk(clk),
         .addr(memAddr[12:0]),
-        .dataOut(memDataRead),
+        .dataOut(romRead),
+        .dataIn(memDataWrite),
+        .write(1'b0),
+        .strobe(romStrobe)
+    );
+
+    // 2k
+    Memory #(.addrBusWidth(11)) ram(
+        .clk(clk),
+        .addr(memAddr[10:0]),
+        .dataOut(ramRead),
         .dataIn(memDataWrite),
         .write(memWrite),
-        .strobe(memStrobe)
+        .strobe(ramStrobe)
     );
+
+    assign romEnable = memAddr[15] == 1'b0;
+    assign ramEnable = memAddr[15] == 1'b1;
+    assign romStrobe = memStrobe  & romEnable;
+    assign ramStrobe = memStrobe  & ramEnable;
+    assign memDataRead = romEnable ? romRead : ramRead;
 
     Processor proc(
         .clk(clk),
