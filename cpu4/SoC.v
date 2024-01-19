@@ -9,7 +9,17 @@ module Memory(
     input           strobe
 );
 
-    reg [7:0] memory[0:8191];
+    localparam MEM_SIZE = 8192;
+    reg [7:0] memory[0 : MEM_SIZE - 1];
+`ifdef BENCH
+    integer i;
+    initial begin
+        for (i = 0; i < MEM_SIZE; i = i + 1) begin
+            memory[i] = 8'h0;
+        end
+    end
+`endif
+
 `include "assembly.vh"
 `include "program.vh"
 

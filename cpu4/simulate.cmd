@@ -33,7 +33,7 @@ set INCLUDE_DIR=..\..
 echo testing %TEST%
 echo -------------
 pushd testcases\%TEST%
-iverilog -o test.o -I . -I %INCLUDE_DIR% -s test%NAME% %INCLUDE_DIR%\%NAME%.v %INCLUDE_DIR%\%NAME%_tb.v
+iverilog -o test.o -I . -I %INCLUDE_DIR% -DBENCH -s test%NAME% %INCLUDE_DIR%\%NAME%.v %INCLUDE_DIR%\%NAME%_tb.v
 if  %ERRORLEVEL% NEQ 0 (
     echo FAILURE
 	popd
