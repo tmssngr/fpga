@@ -23,12 +23,9 @@ VCD info: dumpfile SoC.vcd opened for output.
 0013: read 2nd byte
   a0 10
     incw 10
-    alu:    02       00    =>    03
-         00000010 00000000 => 00000011
-    flags = 0000_0000
     reg[11] = 03
-    alu:    01       00    =>    01
-         00000001 00000000 => 00000001
+    alu:    01       03    =>    01
+         00000001 00000011 => 00000001
     flags = 0000_0000
     reg[10] = 01
 
@@ -37,12 +34,9 @@ VCD info: dumpfile SoC.vcd opened for output.
 0015: read 2nd byte
   80 10
     decw 10
-    alu:    03       00    =>    02
-         00000011 00000000 => 00000010
-    flags = 0000_0000
     reg[11] = 02
-    alu:    01       00    =>    01
-         00000001 00000000 => 00000001
+    alu:    01       02    =>    01
+         00000001 00000010 => 00000001
     flags = 0000_0000
     reg[10] = 01
 
@@ -60,12 +54,9 @@ VCD info: dumpfile SoC.vcd opened for output.
 001a: read 2nd byte
   a0 10
     incw 10
-    alu:    7f       00    =>    80
-         01111111 00000000 => 10000000
-    flags = 0011_0000
     reg[11] = 80
-    alu:    01       00    =>    01
-         00000001 00000000 => 00000001
+    alu:    01       80    =>    01
+         00000001 10000000 => 00000001
     flags = 0000_0000
     reg[10] = 01
 
@@ -74,12 +65,9 @@ VCD info: dumpfile SoC.vcd opened for output.
 001c: read 2nd byte
   80 10
     decw 10
-    alu:    80       00    =>    7f
-         10000000 00000000 => 01111111
-    flags = 0001_0000
     reg[11] = 7f
-    alu:    01       00    =>    01
-         00000001 00000000 => 00000001
+    alu:    01       7f    =>    01
+         00000001 01111111 => 00000001
     flags = 0000_0000
     reg[10] = 01
 
@@ -97,9 +85,6 @@ VCD info: dumpfile SoC.vcd opened for output.
 0021: read 2nd byte
   a0 10
     incw 10
-    alu:    ff       00    =>    00
-         11111111 00000000 => 00000000
-    flags = 0100_0000
     reg[11] = 00
     alu:    01       00    =>    02
          00000001 00000000 => 00000010
@@ -111,12 +96,9 @@ VCD info: dumpfile SoC.vcd opened for output.
 0023: read 2nd byte
   80 10
     decw 10
-    alu:    00       00    =>    ff
-         00000000 00000000 => 11111111
-    flags = 0010_0000
     reg[11] = ff
-    alu:    02       00    =>    01
-         00000010 00000000 => 00000001
+    alu:    02       ff    =>    01
+         00000010 11111111 => 00000001
     flags = 0000_0000
     reg[10] = 01
 
@@ -134,9 +116,6 @@ VCD info: dumpfile SoC.vcd opened for output.
 0028: read 2nd byte
   a0 10
     incw 10
-    alu:    ff       00    =>    00
-         11111111 00000000 => 00000000
-    flags = 0100_0000
     reg[11] = 00
     alu:    ff       00    =>    00
          11111111 00000000 => 00000000
@@ -148,12 +127,9 @@ VCD info: dumpfile SoC.vcd opened for output.
 002a: read 2nd byte
   a0 10
     incw 10
-    alu:    00       00    =>    01
-         00000000 00000000 => 00000001
-    flags = 0000_0000
     reg[11] = 01
-    alu:    00       00    =>    00
-         00000000 00000000 => 00000000
+    alu:    00       01    =>    00
+         00000000 00000001 => 00000000
     flags = 0000_0000
     reg[10] = 00
 
@@ -162,9 +138,6 @@ VCD info: dumpfile SoC.vcd opened for output.
 002c: read 2nd byte
   80 10
     decw 10
-    alu:    01       00    =>    00
-         00000001 00000000 => 00000000
-    flags = 0100_0000
     reg[11] = 00
     alu:    00       00    =>    00
          00000000 00000000 => 00000000
@@ -176,12 +149,9 @@ VCD info: dumpfile SoC.vcd opened for output.
 002e: read 2nd byte
   80 10
     decw 10
-    alu:    00       00    =>    ff
-         00000000 00000000 => 11111111
-    flags = 0010_0000
     reg[11] = ff
-    alu:    00       00    =>    ff
-         00000000 00000000 => 11111111
+    alu:    00       ff    =>    ff
+         00000000 11111111 => 11111111
     flags = 0010_0000
     reg[10] = ff
 

@@ -85,7 +85,7 @@
 
         `assert(uut.proc.aluA, 8'h00);
         `assert(uut.proc.dstRegister, 8'h20);
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -134,7 +134,7 @@
 
         `assert(uut.proc.aluA, 8'h00);
         `assert(uut.proc.dstRegister, 8'h20);
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);

@@ -34,12 +34,12 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'h03);
         `assertFlags('b0000_0000);
 		// upper byte:
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 1);
     @(negedge clk);
@@ -55,12 +55,12 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'h02);
         `assertFlags('b0000_0000);
         // upper byte:
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_DECW);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 1);
     @(negedge clk);
@@ -89,13 +89,13 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'h80);
         // sv
-        `assertFlags('b0011_0000);
+        `assertFlags('b0000_0000); // unchanged
         // upper byte:
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 1);
     @(negedge clk);
@@ -111,13 +111,13 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'h7F);
         // v
-        `assertFlags('b0001_0000);
+        `assertFlags('b0000_0000); // unchanged
         // upper byte:
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_DECW);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 1);
     @(negedge clk);
@@ -146,10 +146,10 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'h00);
-        `assertFlags('b0100_0000);
+        `assertFlags('b0000_0000); // unchanged
         // upper byte:
         `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
@@ -168,11 +168,11 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'hFF);
         // s
-        `assertFlags('b0010_0000);
+        `assertFlags('b0000_0000); // unchanged
         // upper byte:
         `assert(uut.proc.aluMode, ALU1_DECW);
         `assert(uut.proc.writeRegister, 1);
@@ -203,10 +203,10 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'h00);
-        `assertFlags('b0100_0000);
+        `assertFlags('b0000_0000); // unchanged
         // upper byte:
         `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
@@ -225,12 +225,12 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'h01);
-        `assertFlags('b0000_0000);
+        `assertFlags('b0100_0000); // unchanged
         // upper byte:
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 1);
     @(negedge clk);
@@ -246,10 +246,10 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         // upper byte:
-        `assert(uut.proc.aluMode, ALU1_INCW_UPPER_0);
+        `assert(uut.proc.aluMode, ALU1_DECW);
         `assert(uut.proc.writeRegister, 1);
         `assert(uut.proc.writeFlags, 1);
     @(negedge clk);
@@ -267,11 +267,11 @@
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DEC);
         `assert(uut.proc.writeRegister, 1);
-        `assert(uut.proc.writeFlags, 1);
+        `assert(uut.proc.writeFlags, 0);
     @(negedge clk);
         `assertRegister('h11, 'hFF);
         // s
-        `assertFlags('b0010_0000);
+        `assertFlags('b0100_0000); // unchanged
         // upper byte:
         `assert(uut.proc.aluMode, ALU1_DECW);
         `assert(uut.proc.writeRegister, 1);

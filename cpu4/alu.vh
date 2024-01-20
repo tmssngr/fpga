@@ -19,7 +19,6 @@ localparam ALU1_SWAP = 5'h0F;
 // pseudo commands:
 localparam ALU1_LD   = 5'h03;
 localparam ALU1_DA_H = 5'h05;
-localparam ALU1_INCW_UPPER_0 = 5'h07;
 
 
 localparam ALU2_ADD = 5'h10;

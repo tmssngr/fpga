@@ -353,16 +353,14 @@ module Processor(
                     $display("    decw %h", second);
                     aluMode <= ALU1_DEC;
                     writeRegister <= 1;
-                    writeFlags <= 1;
-                    dstRegister <= r8(second | 8'h1);
-                    aluA <= readRegister8(second | 8'h1);
+                    dstRegister <= r8({second[7:1], 1'h1});
+                    aluA <= readRegister8({second[7:1], 1'h1});
                     state <= STATE_ALU1_WORD;
                 end
                 4'hA: begin
                     $display("    incw %h", second);
                     aluMode <= ALU1_INC;
                     writeRegister <= 1;
-                    writeFlags <= 1;
                     dstRegister <= r8({second[7:1], 1'h1});
                     aluA <= readRegister8({second[7:1], 1'h1});
                     state <= STATE_ALU1_WORD;
@@ -624,16 +622,8 @@ module Processor(
         STATE_ALU1_WORD: begin
             dstRegister <= { dstRegister[7:1], 1'b0 };
             aluA <= readRegister8({dstRegister[7:1], 1'b0});
-            // inc(w) -> instrH[1] == 1
-            // dec(w) -> instrH[1] == 0
-            // carry? (aluOut == 0x00 for inc, == 0xFF for dec)
-            if (aluOut == {8{~instrH[1]}}) begin
-                aluMode <= aluMode | 'h8; // inc/dec -> incw/decw
-                // ALU1_INCW and ALU1_DECW have a special handling for the zero flag
-            end
-            else begin
-                aluMode <= ALU1_INCW_UPPER_0;
-            end
+            aluB <= aluOut;
+            aluMode <= aluMode | 'h8; // inc/dec -> incw/decw
             writeRegister <= 1;
             writeFlags <= 1;
             state <= STATE_FETCH_INSTR;
@@ -750,8 +740,9 @@ module Processor(
         end
         STATE_INC_R_RR3: begin
             aluA <= addr[15:8];
+            aluB <= aluOut;
             dstRegister[0] <= 1'b0;
-            aluMode <= ALU1_INCW_UPPER_0;
+            aluMode <= ALU1_INCW;
             writeRegister <= 1;
             state <= STATE_FETCH_INSTR;
         end

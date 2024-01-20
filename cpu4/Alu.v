@@ -20,21 +20,27 @@ module Alu(
         outFlags = flags;
 
         casez (mode)
-        5'b0_?000: begin // ALU1_DEC, ALU1_DECW
+        ALU1_DEC: begin
             out = a - 8'b01;
+            outFlags[FLAG_INDEX_V] = a[7] & ~out[7];
+        end
+        ALU1_DECW: begin // lower byte in b
+            cL = b == 8'hFF;
+            out = a - cL;
             outFlags[FLAG_INDEX_V] = a[7] & ~out[7];
         end
         ALU1_RLC: begin
             out = { a[6:0], flags[FLAG_INDEX_C] };
             outFlags[FLAG_INDEX_C] = a[7];
         end
-        5'b0_?010: begin // ALU1_INC, ALU1_INCW
+        ALU1_INC: begin
             out = a + 8'b01;
             outFlags[FLAG_INDEX_V] = ~a[7] & out[7];
         end
-        ALU1_INCW_UPPER_0: begin
-            out = a;
-            outFlags[FLAG_INDEX_V] = 0;
+        ALU1_INCW: begin // lower byte in b
+            cL = b == 0;
+            out = a + cL;
+            outFlags[FLAG_INDEX_V] = ~a[7] & out[7];
         end
         ALU1_DA: begin
             if (flags[FLAG_INDEX_D] == 1'b0) begin
@@ -138,8 +144,7 @@ module Alu(
         ALU1_LD  : outFlags[FLAG_INDEX_Z] = flags[FLAG_INDEX_Z];
 
         ALU1_DECW, // set only if set from the lower-byte operation, too
-        ALU1_INCW,
-        ALU1_INCW_UPPER_0: outFlags[FLAG_INDEX_Z] = flags[FLAG_INDEX_Z] & (out == 0);
+        ALU1_INCW: outFlags[FLAG_INDEX_Z] = (b == 0) & (out == 0);
 
         default  : outFlags[FLAG_INDEX_Z] = (out == 0);
         endcase
