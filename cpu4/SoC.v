@@ -426,7 +426,7 @@ module Processor(
                 4'hD: begin
                     $display("    ldc Irr%h, r%h",
                              secondL, secondH);
-                    srcRegister <= r4(secondH);
+                    dstRegister <= r4(secondH);
                     state <= STATE_LDC_WRITE1;
                 end
                 4'b111x: begin
@@ -710,7 +710,7 @@ module Processor(
             addr[7:0] <= readRegister4({secondL[3:1], 1'b1});
         end
         STATE_LDC_WRITE3: begin
-            aluA <= readRegister8(srcRegister);
+            aluA <= readRegister8(dstRegister);
             state <= STATE_WRITE_MEM;
         end
 
