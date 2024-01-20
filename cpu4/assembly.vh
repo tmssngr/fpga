@@ -367,3 +367,17 @@ task asm_ldc_Irr_r;
 		asm2(8'hD2, { src, dst});
 	end
 endtask
+task asm_ldci_Ir_Irr;
+	input [3:0] dst;
+	input [3:0] src;
+	begin
+		asm2(8'hC3, { dst, src});
+	end
+endtask
+task asm_ldci_Irr_Ir;
+	input [3:0] dst;
+	input [3:0] src;
+	begin
+		asm2(8'hD3, { src, dst});
+	end
+endtask

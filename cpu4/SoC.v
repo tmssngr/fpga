@@ -461,12 +461,13 @@ module Processor(
                     //TODO
                 end
                 4'hC: begin
-                    $display("    ldci r%h, Irr%h",
+                    $display("    ldci Ir%h, Irr%h",
                              secondH, secondL);
-                    //TODO
+                    dstRegister <= readRegister4(secondH);
+                    state <= STATE_LDC_READ1;
                 end
                 4'hD: begin
-                    $display("    ldci Irr%h, r%h",
+                    $display("    ldci Irr%h, Ir%h",
                              secondL, secondH);
                     //TODO
                 end
@@ -727,6 +728,29 @@ module Processor(
         STATE_READ_MEM2: begin
             aluA <= memDataRead;
             aluMode <= ALU1_LD;
+            writeRegister <= 1;
+            // ldci?
+            state <= instrL == 4'h3
+                ? STATE_INC_R_RR1
+                : STATE_FETCH_INSTR;
+        end
+
+        STATE_INC_R_RR1: begin
+            aluA <= dstRegister;
+            dstRegister <= r4(secondH);
+            aluMode <= ALU1_INC;
+            writeRegister <= 1;
+        end
+        STATE_INC_R_RR2: begin
+            aluA <= addr[7:0];
+            dstRegister <= r4({secondL[3:1], 1'b1});
+            aluMode <= ALU1_INC;
+            writeRegister <= 1;
+        end
+        STATE_INC_R_RR3: begin
+            aluA <= addr[15:8];
+            dstRegister[0] <= 1'b0;
+            aluMode <= ALU1_INCW_UPPER_0;
             writeRegister <= 1;
             state <= STATE_FETCH_INSTR;
         end

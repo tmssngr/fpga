@@ -22,3 +22,6 @@ localparam STATE_LDC_WRITE2   = 19;
 localparam STATE_READ_MEM1    = 20;
 localparam STATE_READ_MEM2    = 21;
 localparam STATE_WRITE_MEM    = 22;
+localparam STATE_INC_R_RR1    = 23;
+localparam STATE_INC_R_RR2    = 24;
+localparam STATE_INC_R_RR3    = 25;

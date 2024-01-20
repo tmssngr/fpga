@@ -9,13 +9,14 @@ call :simulate Alu
 call :test Xcf
 call :test srp_inc_dec
 call :test ld
-call :test ldc
 call :test incw_decw
 call :test da
 call :test add
 call :test cp
 call :test jp
 call :test jr
+call :test ldc
+call :test ldci
 call :test djnz
 call :test push_pop
 
