@@ -465,7 +465,8 @@ module Processor(
                 4'hD: begin
                     $display("    ldci Irr%h, Ir%h",
                              secondL, secondH);
-                    //TODO
+                    dstRegister <= readRegister4(secondH);
+                    state <= STATE_LDC_WRITE1;
                 end
                 4'hE: begin
                     $display("    ld r%h, Ir%h",
@@ -748,7 +749,9 @@ module Processor(
         end
 
         STATE_WRITE_MEM: begin
-            state <= STATE_FETCH_INSTR;
+            state <= instrL == 4'h3
+                ? STATE_INC_R_RR1
+                : STATE_FETCH_INSTR;
         end
 
         endcase
