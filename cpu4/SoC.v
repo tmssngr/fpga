@@ -290,6 +290,14 @@ module Processor(
         case (state)
         STATE_FETCH_INSTR: begin
             $display("\n%h: read instruction", pc);
+            aluA <= 0;
+            aluB <= 0;
+            aluMode <= 0;
+            srcRegister <= 0;
+            dstRegister <= 0;
+            instruction <= 0;
+            second <= 0;
+            third <= 0;
         end
 
         STATE_READ_INSTR: begin

@@ -181,14 +181,14 @@
         `assertSecond('h20);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.srcRegister, 'h22);
+        `assert(uut.proc.dstRegister, 'h22);
         `assertState(STATE_LDC_WRITE1);
     @(negedge clk);
-        `assert(uut.proc.srcRegister, 'h22);
+        `assert(uut.proc.dstRegister, 'h22);
         `assert(uut.proc.addr[15:8], 'hFF);
         `assertState(STATE_LDC_WRITE2);
     @(negedge clk);
-        `assert(uut.proc.srcRegister, 'h22);
+        `assert(uut.proc.dstRegister, 'h22);
         `assert(uut.proc.addr, 'hFF80);
         `assertState(STATE_LDC_WRITE3);
     @(negedge clk);
