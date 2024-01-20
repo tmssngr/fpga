@@ -19,6 +19,7 @@ call :test ldc
 call :test ldci
 call :test djnz
 call :test push_pop
+call :test u8830
 
 pause
 goto :repeat
