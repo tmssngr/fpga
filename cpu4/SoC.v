@@ -85,7 +85,7 @@ module Processor(
     //                  ++---------- P04-P07 Mode: 00 output, 01 input, 1x A12-A15 
     wire stackInternal = p01m[2];
 
-    reg [7:0] dstRegister;
+    reg [7:0] register;
     reg writeRegister = 0;
 
     `include "alu.vh"
@@ -272,14 +272,14 @@ module Processor(
         writeFlags <= 0;
 
         if (writeRegister) begin
-            $display("    reg[%h] = %h", dstRegister, aluOut);
-            casez (dstRegister)
-            8'b0???_????: registers[dstRegister] <= aluOut;
-            8'hF8:        p01m                   <= aluOut;
-            8'hFC:        flags                  <= aluOut;
-            8'hFD:        rp                     <= aluOut[7:4];
-            8'hFE:        sp[15:8]               <= aluOut;
-            8'hFF:        sp[7:0]                <= aluOut;
+            $display("    reg[%h] = %h", register, aluOut);
+            casez (register)
+            8'b0???_????: registers[register] <= aluOut;
+            8'hF8:        p01m                <= aluOut;
+            8'hFC:        flags               <= aluOut;
+            8'hFD:        rp                  <= aluOut[7:4];
+            8'hFE:        sp[15:8]            <= aluOut;
+            8'hFF:        sp[7:0]             <= aluOut;
             endcase
         end
         writeRegister <= 0;
@@ -292,7 +292,7 @@ module Processor(
             aluA <= 0;
             aluB <= 0;
             aluMode <= 0;
-            dstRegister <= 0;
+            register <= 0;
             instruction <= 0;
             second <= 0;
             third <= 0;
@@ -346,20 +346,20 @@ module Processor(
                     $display("    pop %h", second);
                     // dst <- @SP
                     // SP <- SP + 1
-                    dstRegister <= r8(second);
+                    register <= r8(second);
                     state <= STATE_POP;
                 end
                 4'h7: begin
                     $display("    push %h", second);
                     sp <= sp - 1;
-                    dstRegister <= r8(second);
+                    register <= r8(second);
                     state <= STATE_PUSH;
                 end
                 4'h8: begin
                     $display("    decw %h", second);
                     aluMode <= ALU1_DEC;
                     writeRegister <= 1;
-                    dstRegister <= r8({second[7:1], 1'h1});
+                    register <= r8({second[7:1], 1'h1});
                     aluA <= readRegister8({second[7:1], 1'h1});
                     state <= STATE_ALU1_WORD;
                 end
@@ -367,7 +367,7 @@ module Processor(
                     $display("    incw %h", second);
                     aluMode <= ALU1_INC;
                     writeRegister <= 1;
-                    dstRegister <= r8({second[7:1], 1'h1});
+                    register <= r8({second[7:1], 1'h1});
                     aluA <= readRegister8({second[7:1], 1'h1});
                     state <= STATE_ALU1_WORD;
                 end
@@ -375,7 +375,7 @@ module Processor(
                     $display("   %s %h", 
                              alu1OpName(instrH), second);
                     aluMode <= alu1OpCode(instrH);
-                    dstRegister <= r8(second);
+                    register <= r8(second);
                     state <= STATE_ALU1_OP;
                 end
                 endcase
@@ -406,7 +406,7 @@ module Processor(
                     $display("   %s @%h", 
                              alu1OpName(instrH), second);
                     aluMode <= alu1OpCode(instrH);
-                    dstRegister <= readRegister8(r8(second));
+                    register <= readRegister8(r8(second));
                     state <= STATE_ALU1_OP;
                 end
                 endcase
@@ -426,13 +426,13 @@ module Processor(
                 4'hC: begin
                     $display("    ldc r%h, Irr%h",
                              secondH, secondL);
-                    dstRegister <= r4(secondH);
+                    register <= r4(secondH);
                     state <= STATE_LDC_READ1;
                 end
                 4'hD: begin
                     $display("    ldc Irr%h, r%h",
                              secondL, secondH);
-                    dstRegister <= r4(secondH);
+                    register <= r4(secondH);
                     state <= STATE_LDC_WRITE1;
                 end
                 4'b111x: begin
@@ -442,7 +442,7 @@ module Processor(
                     $display("    %s r%h, r%h",
                              alu2OpName(instrH),
                              secondH, secondL);
-                    dstRegister <= r4(secondH);
+                    register <= r4(secondH);
                     aluA <= readRegister4(secondH);
                     //TODO
                     aluB <= readRegister4(secondL);
@@ -465,13 +465,13 @@ module Processor(
                 4'hC: begin
                     $display("    ldci Ir%h, Irr%h",
                              secondH, secondL);
-                    dstRegister <= readRegister4(secondH);
+                    register <= readRegister4(secondH);
                     state <= STATE_LDC_READ1;
                 end
                 4'hD: begin
                     $display("    ldci Irr%h, Ir%h",
                              secondL, secondH);
-                    dstRegister <= readRegister4(secondH);
+                    register <= readRegister4(secondH);
                     state <= STATE_LDC_WRITE1;
                 end
                 4'hE: begin
@@ -489,7 +489,7 @@ module Processor(
                              alu2OpName(instrH),
                              secondH, secondL);
                     aluA <= readRegister4(secondH);
-                    dstRegister <= readRegister4(secondL);
+                    register <= readRegister4(secondL);
                     state <= STATE_ALU2_IR;
                 end
                 endcase
@@ -507,7 +507,7 @@ module Processor(
                 end
                 4'hE: begin
                     $display("    ld %h, %h", third, second);
-                    dstRegister <= r8(third);
+                    register <= r8(third);
                     aluA <= readRegister8(r8(second));
                     aluMode <= ALU1_LD;
                     writeRegister <= 1;
@@ -516,7 +516,7 @@ module Processor(
                     $display("    %s %h, %h",
                              alu2OpName(instrH),
                              third, second);
-                    dstRegister <= r8(third);
+                    register <= r8(third);
                     aluA <= readRegister8(r8(third));
                     //TODO
                     aluB <= readRegister8(r8(second));
@@ -537,7 +537,7 @@ module Processor(
                 end
                 4'hE: begin
                     $display("    ld %h, #%h", second, third);
-                    dstRegister <= r8(second);
+                    register <= r8(second);
                     aluA <= third;
                     aluMode <= ALU1_LD;
                     writeRegister <= 1;
@@ -546,7 +546,7 @@ module Processor(
                     $display("    %s %h, #%h",
                              alu2OpName(instrH),
                              second, third);
-                    dstRegister <= r8(second);
+                    register <= r8(second);
                     aluA <= readRegister8(r8(second));
                     aluB <= third;
                     state <= STATE_ALU2_OP;
@@ -555,7 +555,7 @@ module Processor(
             end
             4'h8: begin
                 $display("    ld r%h, %h", instrH, secondL);
-                dstRegister <= r4(instrH);
+                register <= r4(instrH);
                 aluB <= readRegister8(r8(second));
                 aluMode <= ALU1_LD;
                 writeRegister <= 1;
@@ -566,7 +566,7 @@ module Processor(
             end
             4'hA: begin
                 $display("    djnz r%h, %h", instrH, second);
-                dstRegister <= r4(instrH);
+                register <= r4(instrH);
                 state <= STATE_DJNZ1;
             end
             4'hB: begin
@@ -574,7 +574,7 @@ module Processor(
             end
             4'hC: begin
                 $display("    ld r%h, #%h", instrH, second);
-                dstRegister <= r4(instrH);
+                register <= r4(instrH);
                 aluA <= second;
                 aluMode <= ALU1_LD;
                 writeRegister <= 1;
@@ -626,8 +626,8 @@ module Processor(
         end
 
         STATE_ALU1_WORD: begin
-            dstRegister <= { dstRegister[7:1], 1'b0 };
-            aluA <= readRegister8({dstRegister[7:1], 1'b0});
+            register <= { register[7:1], 1'b0 };
+            aluA <= readRegister8({register[7:1], 1'b0});
             aluB <= aluOut;
             aluMode <= aluMode | 'h8; // inc/dec -> incw/decw
             writeRegister <= 1;
@@ -636,7 +636,7 @@ module Processor(
         end
 
         STATE_ALU1_OP: begin
-            aluA <= readRegister8(dstRegister);
+            aluA <= readRegister8(register);
             writeRegister <= 1;
             writeFlags <= 1;
 
@@ -657,8 +657,8 @@ module Processor(
         end
 
         STATE_ALU2_IR: begin
-            aluB <= readRegister8(dstRegister);
-            dstRegister <= r4(secondH);
+            aluB <= readRegister8(register);
+            register <= r4(secondH);
         end
 
         STATE_ALU2_OP: begin
@@ -672,8 +672,8 @@ module Processor(
 
         STATE_PUSH: begin
             aluMode <= ALU1_LD;
-            aluA <= readRegister8(dstRegister);
-            dstRegister <= sp[7:0];
+            aluA <= readRegister8(register);
+            register <= sp[7:0];
             writeRegister <= 1;
             state <= STATE_FETCH_INSTR;
         end
@@ -687,7 +687,7 @@ module Processor(
         end
 
         STATE_DJNZ1: begin
-            aluA <= readRegister8(dstRegister);
+            aluA <= readRegister8(register);
             aluMode <= ALU1_DEC;
             writeRegister <= 1;
         end
@@ -713,7 +713,7 @@ module Processor(
             addr[7:0] <= readRegister4({secondL[3:1], 1'b1});
         end
         STATE_LDC_WRITE3: begin
-            aluA <= readRegister8(dstRegister);
+            aluA <= readRegister8(register);
             state <= STATE_WRITE_MEM;
         end
 
@@ -730,21 +730,21 @@ module Processor(
         end
 
         STATE_INC_R_RR1: begin
-            aluA <= dstRegister;
-            dstRegister <= r4(secondH);
+            aluA <= register;
+            register <= r4(secondH);
             aluMode <= ALU1_INC;
             writeRegister <= 1;
         end
         STATE_INC_R_RR2: begin
             aluA <= addr[7:0];
-            dstRegister <= r4({secondL[3:1], 1'b1});
+            register <= r4({secondL[3:1], 1'b1});
             aluMode <= ALU1_INC;
             writeRegister <= 1;
         end
         STATE_INC_R_RR3: begin
             aluA <= addr[15:8];
             aluB <= aluOut;
-            dstRegister[0] <= 1'b0;
+            register[0] <= 1'b0;
             aluMode <= ALU1_INCW;
             writeRegister <= 1;
             state <= STATE_FETCH_INSTR;

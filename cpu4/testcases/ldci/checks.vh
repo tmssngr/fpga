@@ -48,7 +48,7 @@
         `assertSecond('h20);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h24);
+        `assert(uut.proc.register, 'h24);
         `assertState(STATE_LDC_READ1);
     @(negedge clk);
         `assert(uut.proc.addr[15:8], 'h0);
@@ -68,7 +68,7 @@
         `assertRegister(8'h24, 8'h08);
 
         `assert(uut.proc.aluA, 8'h24);
-        `assert(uut.proc.dstRegister, 8'h22);
+        `assert(uut.proc.register, 8'h22);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR2);
@@ -76,7 +76,7 @@
         `assertRegister(8'h22, 8'h25);
 
         `assert(uut.proc.aluA, 8'h02);
-        `assert(uut.proc.dstRegister, 8'h21);
+        `assert(uut.proc.register, 8'h21);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR3);
@@ -84,7 +84,7 @@
         `assertRegister(8'h21, 8'h03);
 
         `assert(uut.proc.aluA, 8'h00);
-        `assert(uut.proc.dstRegister, 8'h20);
+        `assert(uut.proc.register, 8'h20);
         `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_FETCH_INSTR);
@@ -97,7 +97,7 @@
         `assertSecond('h20);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h25);
+        `assert(uut.proc.register, 'h25);
         `assertState(STATE_LDC_READ1);
     @(negedge clk);
         `assert(uut.proc.addr[15:8], 'h0);
@@ -117,7 +117,7 @@
         `assertRegister(8'h25, 8'h03);
 
         `assert(uut.proc.aluA, 8'h25);
-        `assert(uut.proc.dstRegister, 8'h22);
+        `assert(uut.proc.register, 8'h22);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR2);
@@ -125,7 +125,7 @@
         `assertRegister(8'h22, 8'h26);
 
         `assert(uut.proc.aluA, 8'h03);
-        `assert(uut.proc.dstRegister, 8'h21);
+        `assert(uut.proc.register, 8'h21);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR3);
@@ -133,7 +133,7 @@
         `assertRegister(8'h21, 8'h04);
 
         `assert(uut.proc.aluA, 8'h00);
-        `assert(uut.proc.dstRegister, 8'h20);
+        `assert(uut.proc.register, 8'h20);
         `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_FETCH_INSTR);
@@ -179,7 +179,7 @@
         `assertSecond('h20);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h24);
+        `assert(uut.proc.register, 'h24);
         `assertState(STATE_LDC_WRITE1);
     @(negedge clk);
         `assert(uut.proc.addr[15:8], 'hFF);
@@ -197,7 +197,7 @@
         `assertRegister(8'h24, 8'h08);
 
         `assert(uut.proc.aluA, 8'h24);
-        `assert(uut.proc.dstRegister, 8'h22);
+        `assert(uut.proc.register, 8'h22);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR2);
@@ -205,7 +205,7 @@
         `assertRegister(8'h22, 8'h25);
 
         `assert(uut.proc.aluA, 8'hFE);
-        `assert(uut.proc.dstRegister, 8'h21);
+        `assert(uut.proc.register, 8'h21);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR3);
@@ -213,7 +213,7 @@
         `assertRegister(8'h21, 8'hFF);
 
         `assert(uut.proc.aluA, 8'hFF);
-        `assert(uut.proc.dstRegister, 8'h20);
+        `assert(uut.proc.register, 8'h20);
         `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_FETCH_INSTR);
@@ -226,7 +226,7 @@
         `assertSecond('h20);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h25);
+        `assert(uut.proc.register, 'h25);
         `assertState(STATE_LDC_WRITE1);
     @(negedge clk);
         `assert(uut.proc.addr[15:8], 'hFF);
@@ -244,7 +244,7 @@
         `assertRegister(8'h25, 8'h03);
 
         `assert(uut.proc.aluA, 8'h25);
-        `assert(uut.proc.dstRegister, 8'h22);
+        `assert(uut.proc.register, 8'h22);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR2);
@@ -252,7 +252,7 @@
         `assertRegister(8'h22, 8'h26);
 
         `assert(uut.proc.aluA, 8'hFF);
-        `assert(uut.proc.dstRegister, 8'h21);
+        `assert(uut.proc.register, 8'h21);
         `assert(uut.proc.aluMode, ALU1_INC);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_INC_R_RR3);
@@ -260,7 +260,7 @@
         `assertRegister(8'h21, 8'h00);
 
         `assert(uut.proc.aluA, 8'hFF);
-        `assert(uut.proc.dstRegister, 8'h20);
+        `assert(uut.proc.register, 8'h20);
         `assert(uut.proc.aluMode, ALU1_INCW);
         `assert(uut.proc.writeRegister, 1);
         `assertState(STATE_FETCH_INSTR);
