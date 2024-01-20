@@ -363,8 +363,8 @@ module Processor(
                     aluMode <= ALU1_INC;
                     writeRegister <= 1;
                     writeFlags <= 1;
-                    dstRegister <= r8(second | 8'h1);
-                    aluA <= readRegister8(second | 8'h1);
+                    dstRegister <= r8({second[7:1], 1'h1});
+                    aluA <= readRegister8({second[7:1], 1'h1});
                     state <= STATE_ALU1_WORD;
                 end
                 default: begin
@@ -705,8 +705,8 @@ module Processor(
         end
 
         STATE_LDC_READ1: begin
-            addr[15:8] <= readRegister4(secondL & ~1);
-            srcRegister <= r4(secondL | 1);
+            addr[15:8] <= readRegister4({secondL[3:1], 1'b0});
+            srcRegister <= r4({secondL[3:1], 1'b1});
             state <= STATE_LDC_READ2;
         end
         STATE_LDC_READ2: begin
