@@ -50,7 +50,7 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
         `assertState(STATE_ALU1_OP);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
@@ -93,7 +93,7 @@
         `assertSecond('hE0);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
         `assertState(STATE_ALU1_OP);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
@@ -147,7 +147,7 @@
         `assertSecond('h10);
     @(negedge clk);
         `assertState(STATE_ALU1_OP);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
     @(negedge clk);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
@@ -180,7 +180,7 @@
         `assertSecond('h10);
     @(negedge clk);
         `assertState(STATE_ALU1_OP);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
     @(negedge clk);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
@@ -233,7 +233,7 @@
         `assertSecond('h10);
     @(negedge clk);
         `assertState(STATE_ALU1_OP);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
     @(negedge clk);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
@@ -266,7 +266,7 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
         `assertState(STATE_ALU1_OP);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
@@ -332,7 +332,7 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
         `assertState(STATE_ALU1_OP);
     @(negedge clk);
         `assert(uut.proc.aluMode, ALU1_DA);
@@ -376,7 +376,7 @@
         `assertSecond('h10);
     @(negedge clk);
         `assertState(STATE_ALU1_OP);
-        `assert(uut.proc.srcRegister, 'h10);
+        `assert(uut.proc.dstRegister, 'h10);
     @(negedge clk);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);

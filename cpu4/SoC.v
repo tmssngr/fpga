@@ -85,7 +85,6 @@ module Processor(
     //                  ++---------- P04-P07 Mode: 00 output, 01 input, 1x A12-A15 
     wire stackInternal = p01m[2];
 
-    reg [7:0] srcRegister;
     reg [7:0] dstRegister;
     reg writeRegister = 0;
 
@@ -293,7 +292,6 @@ module Processor(
             aluA <= 0;
             aluB <= 0;
             aluMode <= 0;
-            srcRegister <= 0;
             dstRegister <= 0;
             instruction <= 0;
             second <= 0;
@@ -348,13 +346,13 @@ module Processor(
                     $display("    pop %h", second);
                     // dst <- @SP
                     // SP <- SP + 1
-                    srcRegister <= r8(second);
+                    dstRegister <= r8(second);
                     state <= STATE_POP;
                 end
                 4'h7: begin
                     $display("    push %h", second);
                     sp <= sp - 1;
-                    srcRegister <= r8(second);
+                    dstRegister <= r8(second);
                     state <= STATE_PUSH;
                 end
                 4'h8: begin
@@ -377,7 +375,7 @@ module Processor(
                     $display("   %s %h", 
                              alu1OpName(instrH), second);
                     aluMode <= alu1OpCode(instrH);
-                    srcRegister <= r8(second);
+                    dstRegister <= r8(second);
                     state <= STATE_ALU1_OP;
                 end
                 endcase
@@ -408,7 +406,7 @@ module Processor(
                     $display("   %s @%h", 
                              alu1OpName(instrH), second);
                     aluMode <= alu1OpCode(instrH);
-                    srcRegister <= readRegister8(r8(second));
+                    dstRegister <= readRegister8(r8(second));
                     state <= STATE_ALU1_OP;
                 end
                 endcase
@@ -490,9 +488,8 @@ module Processor(
                     $display("    %s r%h, Ir%h",
                              alu2OpName(instrH),
                              secondH, secondL);
-                    dstRegister <= r4(secondH);
                     aluA <= readRegister4(secondH);
-                    srcRegister <= readRegister4(secondL);
+                    dstRegister <= readRegister4(secondL);
                     state <= STATE_ALU2_IR;
                 end
                 endcase
@@ -639,8 +636,7 @@ module Processor(
         end
 
         STATE_ALU1_OP: begin
-            aluA <= readRegister8(srcRegister);
-            dstRegister <= srcRegister;
+            aluA <= readRegister8(dstRegister);
             writeRegister <= 1;
             writeFlags <= 1;
 
@@ -657,12 +653,12 @@ module Processor(
             aluMode <= ALU1_DA_H;
             writeRegister <= 1;
             writeFlags <= 1;
-            dstRegister <= srcRegister;
             state <= STATE_FETCH_INSTR;
         end
 
         STATE_ALU2_IR: begin
-            aluB <= readRegister8(srcRegister);
+            aluB <= readRegister8(dstRegister);
+            dstRegister <= r4(secondH);
         end
 
         STATE_ALU2_OP: begin
@@ -676,7 +672,7 @@ module Processor(
 
         STATE_PUSH: begin
             aluMode <= ALU1_LD;
-            aluA <= readRegister8(srcRegister);
+            aluA <= readRegister8(dstRegister);
             dstRegister <= sp[7:0];
             writeRegister <= 1;
             state <= STATE_FETCH_INSTR;
@@ -686,7 +682,6 @@ module Processor(
             aluMode <= ALU1_LD;
             aluA <= readRegister8(sp[7:0]);
             sp <= sp + 1;
-            dstRegister <= srcRegister;
             writeRegister <= 1;
             state <= STATE_FETCH_INSTR;
         end
@@ -704,11 +699,10 @@ module Processor(
 
         STATE_LDC_READ1: begin
             addr[15:8] <= readRegister4({secondL[3:1], 1'b0});
-            srcRegister <= r4({secondL[3:1], 1'b1});
             state <= STATE_LDC_READ2;
         end
         STATE_LDC_READ2: begin
-            addr[7:0] <= readRegister8(srcRegister);
+            addr[7:0] <= readRegister4({secondL[3:1], 1'b1});
             state <= STATE_READ_MEM1;
         end
 

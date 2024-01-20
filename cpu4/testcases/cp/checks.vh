@@ -49,10 +49,10 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.dstRegister, 'h20);
-        `assert(uut.proc.srcRegister, 'h20);
         `assert(uut.proc.aluA, 'h09);
         `assertState(STATE_ALU2_IR);
     @(negedge clk);
+        `assert(uut.proc.dstRegister, 'h20);
         `assertState(STATE_ALU2_OP);
     @(negedge clk);
         `assert(uut.proc.dstRegister, 'h20);
@@ -85,11 +85,11 @@
         `assertSecond('h02);
         `assertState(STATE_DECODE);
     @(negedge clk);
-        `assert(uut.proc.dstRegister, 'h20);
-        `assert(uut.proc.srcRegister, 'h21);
+        `assert(uut.proc.dstRegister, 'h21);
         `assert(uut.proc.aluA, 'h09);
         `assertState(STATE_ALU2_IR);
     @(negedge clk);
+        `assert(uut.proc.dstRegister, 'h20);
         `assertState(STATE_ALU2_OP);
     @(negedge clk);
         `assert(uut.proc.dstRegister, 'h20);
