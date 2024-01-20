@@ -37,8 +37,11 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.dstRegister, 'h22);
+        `assertState(STATE_LDC_READ1);
+    @(negedge clk);
+        `assert(uut.proc.dstRegister, 'h22);
         `assert(uut.proc.addr[15:8], 'h0);
-        `assertState(STATE_LDC_READ);
+        `assertState(STATE_LDC_READ2);
     @(negedge clk);
         `assert(uut.proc.dstRegister, 'h22);
         `assert(uut.proc.addr, 'h0B);
@@ -126,6 +129,51 @@
         `assertRegister('h20, 'hFF);
         `assertRegister('h21, 'h80);
 
+// ldc r2, Irr0
+    repeat (3) @(negedge clk);
+        `assertInstr('hC2);
+        `assertSecond('h20);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assert(uut.proc.dstRegister, 'h22);
+        `assertState(STATE_LDC_READ1);
+    @(negedge clk);
+        `assert(uut.proc.dstRegister, 'h22);
+        `assert(uut.proc.addr[15:8], 'hFF);
+        `assertState(STATE_LDC_READ2);
+    @(negedge clk);
+        `assert(uut.proc.dstRegister, 'h22);
+        `assert(uut.proc.addr, 'hFF80);
+        `assertState(STATE_READ_MEM1);
+    @(negedge clk);
+        `assertRam(16'hFF80, 8'h00);
+        `assertState(STATE_READ_MEM2);
+    @(negedge clk);
+        `assert(uut.proc.aluA, 'h00);
+        `assert(uut.proc.aluMode, ALU1_LD);
+        `assert(uut.proc.writeRegister, 1);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assertRegister(8'h22, 'h00);
+
+        `assertRegister(8'h20, 'hFF);
+        `assertRegister(8'h21, 'h80);
+
+// int 22
+    repeat (3) @(negedge clk);
+        `assertInstr('h20);
+        `assertSecond('h22);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_ALU1_OP);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assertRegister(8'h22, 'h01);
+
+        `assertRegister(8'h20, 'hFF);
+        `assertRegister(8'h21, 'h80);
+
 // ldc Irr0, r2
     repeat (3) @(negedge clk);
         `assertInstr('hD2);
@@ -143,16 +191,16 @@
         `assertState(STATE_LDC_WRITE2);
     @(negedge clk);
         `assert(uut.proc.dstRegister, 'h21);
-        `assert(uut.proc.aluA, 'h0F);
+        `assert(uut.proc.aluA, 'h01);
         `assert(uut.proc.addr, 'hFF80);
         `assertState(STATE_WRITE_MEM);
     @(negedge clk);
+        `assertRam(16'hFF80, 8'h01);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        `assertRam(16'hFF80, 8'h0F);
         `assertRegister(8'h20, 'hFF);
         `assertRegister(8'h21, 'h80);
-        `assertRegister(8'h22, 'h0F);
+        `assertRegister(8'h22, 'h01);
 
 // jmp L0
     repeat (5) @(negedge clk);

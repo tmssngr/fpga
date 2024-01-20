@@ -252,6 +252,7 @@ module Processor(
                                 ? nextRelativePc
                                 : pc;
     assign memAddr = (state == STATE_READ_MEM1)
+                   | (state == STATE_READ_MEM2)
                    | (state == STATE_WRITE_MEM)
                      ? addr : pc;
     assign memDataWrite = aluA;
@@ -422,9 +423,7 @@ module Processor(
                     $display("    ldc r%h, Irr%h",
                              secondH, secondL);
                     dstRegister <= r4(secondH);
-                    addr[15:8] <= readRegister4(secondL & ~1);
-                    srcRegister <= r4(secondL | 1);
-                    state <= STATE_LDC_READ;
+                    state <= STATE_LDC_READ1;
                 end
                 4'hD: begin
                     $display("    ldc Irr%h, r%h",
@@ -705,7 +704,12 @@ module Processor(
             state <= STATE_FETCH_INSTR;
         end
 
-        STATE_LDC_READ: begin
+        STATE_LDC_READ1: begin
+            addr[15:8] <= readRegister4(secondL & ~1);
+            srcRegister <= r4(secondL | 1);
+            state <= STATE_LDC_READ2;
+        end
+        STATE_LDC_READ2: begin
             addr[7:0] <= readRegister8(srcRegister);
             state <= STATE_READ_MEM1;
         end
