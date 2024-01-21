@@ -81,7 +81,7 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.register, 'h20);
-        `assertState(STATE_POP);
+        `assertState(STATE_POP_I);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -96,7 +96,7 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.register, 'h21);
-        `assertState(STATE_POP);
+        `assertState(STATE_POP_I);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -151,7 +151,7 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.register, 'h24);
-        `assertState(STATE_POP);
+        `assertState(STATE_POP_I);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
