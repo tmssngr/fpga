@@ -350,10 +350,22 @@ task asm_push;
         asm2(8'h70, src);
     end
 endtask
+task asm_pushIn;
+    input [7:0] src;
+    begin
+        asm2(8'h71, src);
+    end
+endtask
 task asm_pop;
     input [7:0] dst;
     begin
         asm2(8'h50, dst);
+    end
+endtask
+task asm_popIn;
+    input [7:0] dst;
+    begin
+        asm2(8'h51, dst);
     end
 endtask
 

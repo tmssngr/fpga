@@ -389,11 +389,15 @@ module Processor(
                 end
                 4'h5: begin
                     $display("    pop @%h", second);
-                    //TODO
+                    // 10+5 cycles
+                    register <= readRegister8(second);
+                    state <= STATE_POP;
                 end
                 4'h7: begin
                     $display("    push @%h", second);
-                    //TODO
+                    // 12/14+1 cycles
+                    register <= readRegister8(second);
+                    state <= STATE_PUSH1;
                 end
                 4'h8: begin
                     $display("    decw @%h", second);

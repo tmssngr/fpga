@@ -12,5 +12,10 @@ initial begin
       asm_pop('hE0);
       asm_pop('hE1);
 
+      asm_ld_r_IM(2, 'h20);
+      asm_pushIn('h22);
+      asm_ld_r_IM(2, 'h24);
+      asm_popIn('h22);
+
       asm_jp(JC_ALWAYS, L0_);
 end

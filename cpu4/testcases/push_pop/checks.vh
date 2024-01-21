@@ -105,6 +105,63 @@
         `assertRegister('h20, 'h34);
         `assertRegister('h21, 'h12);
 
+// ld r2, #20
+	repeat (3) @(negedge clk);
+        `assertInstr('h2C);
+        `assertSecond('h20);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assertRegister('h20, 'h34);
+        `assertRegister('h21, 'h12);
+        `assertRegister('h22, 'h20);
+
+// push @22
+    repeat (3) @(negedge clk);
+        `assertInstr('h71);
+        `assertSecond('h22);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assert(uut.proc.register, 'h20);
+        `assertState(STATE_PUSH1);
+    @(negedge clk);
+        `assertState(STATE_PUSH2);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assert(uut.proc.sp, 'h7F);
+        `assertRegister('h7F, 'h34);
+
+// ld r2, #24
+	repeat (3) @(negedge clk);
+        `assertInstr('h2C);
+        `assertSecond('h24);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assertRegister('h20, 'h34);
+        `assertRegister('h21, 'h12);
+        `assertRegister('h22, 'h24);
+
+// pop @22
+    repeat (3) @(negedge clk);
+        `assertInstr('h51);
+        `assertSecond('h22);
+        `assertState(STATE_DECODE);
+    @(negedge clk);
+        `assert(uut.proc.register, 'h24);
+        `assertState(STATE_POP);
+    @(negedge clk);
+        `assertState(STATE_FETCH_INSTR);
+    @(negedge clk);
+        `assert(uut.proc.sp, 'h80);
+        `assertRegister('h20, 'h34);
+        `assertRegister('h21, 'h12);
+        `assertRegister('h22, 'h24);
+        `assertRegister('h24, 'h34);
+
 // jmp 0
     repeat (5) @(negedge clk);
         `assertInstr('h8D);
