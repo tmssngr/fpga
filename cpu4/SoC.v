@@ -23,6 +23,7 @@ module Memory #(
 
 `include "assembly.vh"
 `include "program.vh"
+`include "sfr.vh"
 
     always @(posedge clk) begin
         if (strobe) begin
@@ -88,6 +89,7 @@ module Processor(
     reg [7:0] register;
     reg writeRegister = 0;
 
+    `include "sfr.vh"
     `include "alu.vh"
     reg  [7:0] aluA = 0;
     reg  [7:0] aluB = 0;
@@ -125,11 +127,11 @@ module Processor(
     );
         casez (r)
         8'b0???_????: readRegister8 = registers[r[6:0]];
-        8'hF8:        readRegister8 = p01m;
-        8'hFC:        readRegister8 = flags;
-        8'hFD:        readRegister8 = { rp, 4'h0 };
-        8'hFE:        readRegister8 = sp[15:8];
-        8'hFF:        readRegister8 = sp[7:0];
+        P01M:         readRegister8 = p01m;
+        FLAGS:        readRegister8 = flags;
+        RP:           readRegister8 = { rp, 4'h0 };
+        SPH:          readRegister8 = sp[15:8];
+        SPL:          readRegister8 = sp[7:0];
         default:      readRegister8 = 0;
         endcase
     endfunction
@@ -277,11 +279,11 @@ module Processor(
             $display("    reg[%h] = %h", register, aluOut);
             casez (register)
             8'b0???_????: registers[register] <= aluOut;
-            8'hF8:        p01m                <= aluOut;
-            8'hFC:        flags               <= aluOut;
-            8'hFD:        rp                  <= aluOut[7:4];
-            8'hFE:        sp[15:8]            <= aluOut;
-            8'hFF:        sp[7:0]             <= aluOut;
+            P01M:         p01m                <= aluOut;
+            FLAGS:        flags               <= aluOut;
+            RP:           rp                  <= aluOut[7:4];
+            SPH:          sp[15:8]            <= aluOut;
+            SPL:          sp[7:0]             <= aluOut;
             endcase
         end
         writeRegister <= 0;
@@ -776,7 +778,7 @@ module Processor(
             aluMode <= ALU1_LD;
             aluA <= readRegister8(sp[7:0]);
             sp <= sp + 1;
-            register <= 8'hFC;
+            register <= FLAGS;
             writeRegister <= 1;
         end
         STATE_RET_I1: begin
