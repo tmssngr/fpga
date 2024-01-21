@@ -1,5 +1,6 @@
 localparam P3M  = 8'hF7;
 localparam P01M = 8'hF8;
+
 localparam M_001D = 16'h001D;
 localparam M_003D = 16'h003D;
 
@@ -12,7 +13,7 @@ initial begin
       asm_nop();
       asm_tm_R_IM('hE3, 'b0000_0100);
       asm_ld_r_IM(3, 'hFF);
-      asm_jr(JC_NZ, 5); // M_001D
+      asm_jr(JC_NZ, M_001D);
       asm_tm_R_IM('hE3, 'b0000_0100);
       asm_jr(JC_NZ, M_003D);
 label(M_001D);

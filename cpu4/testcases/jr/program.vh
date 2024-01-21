@@ -1,14 +1,17 @@
+localparam L0_ = 16'h000C;
+localparam L1_ = 16'h0010;
+
 initial begin
       default_interrupt_vectors();
 
-// L0:
-      asm_jr(JC_NEVER, 8'hFE); // 0B ..
+label(L0_);
+      asm_jr(JC_NEVER, L0_);
 
       asm_ld_r_IM(0, 3);
 
-// L1:
+label(L1_);
       asm_add_R_IM(0, 8'hFF);
-      asm_jr(JC_NZ, 8'hFB);     // L1
+      asm_jr(JC_NZ, L1_);
 
-      asm_jr(JC_ALWAYS, 8'hF5); // L0
+      asm_jr(JC_ALWAYS, L0_);
 end

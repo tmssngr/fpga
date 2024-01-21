@@ -230,9 +230,11 @@ localparam JC_NZ = 14;
 localparam JC_NC = 15;
 task asm_jr;
 	input [3:0] condition;
-    input [7:0] addr;
+    input [15:0] addr;
+    integer ra;
     begin
-        asm2({ condition, 4'hB }, addr);
+        ra = addr - memPC - 2;
+        asm2({ condition, 4'hB }, ra);
     end
 endtask
 task asm_jp;
@@ -244,9 +246,11 @@ task asm_jp;
 endtask
 task asm_djnz;
     input [3:0] dst;
-    input [7:0] addr;
+    input [15:0] addr;
+    integer ra;
     begin
-        asm2({ dst, 4'hA }, addr);
+        ra = addr - memPC - 2;
+        asm2({ dst, 4'hA }, ra);
     end
 endtask
 
