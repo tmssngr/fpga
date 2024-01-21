@@ -27,3 +27,7 @@ localparam STATE_WRITE_MEM    = STATE_READ_MEM2 + 1;
 localparam STATE_INC_R_RR1    = STATE_WRITE_MEM + 1;
 localparam STATE_INC_R_RR2    = STATE_INC_R_RR1 + 1;
 localparam STATE_INC_R_RR3    = STATE_INC_R_RR2 + 1;
+localparam STATE_IRET_I       = STATE_INC_R_RR3 + 1;
+localparam STATE_RET_I1       = STATE_IRET_I + 1;
+localparam STATE_RET_I2       = STATE_RET_I1 + 1;
+localparam STATE_RET_I3       = STATE_RET_I2 + 1;

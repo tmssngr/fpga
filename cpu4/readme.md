@@ -53,8 +53,8 @@ Its aim is to be able to run the [Tiny computer](https://hc-ddr.hucki.net/wiki/d
       - [x] `push IR`
       - [ ] `call IRR`
       - [ ] `call DA`
-      - [ ] `ret`
-      - [ ] `iret`
+      - [x] `ret`
+      - [x] `iret`
     - [ ] external stack
 - [ ] port 2
 - [ ] port 3

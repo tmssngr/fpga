@@ -403,3 +403,15 @@ task asm_ldci_Irr_Ir;
 		asm2(8'hD3, { src, dst});
 	end
 endtask
+
+task asm_ret;
+    begin
+        asm1(8'hAF);
+    end
+endtask
+
+task asm_iret;
+    begin
+        asm1(8'hBF);
+    end
+endtask

@@ -239,7 +239,7 @@ module Processor(
     reg [STATES_MAX_BIT:0] state = STATE_FETCH_INSTR;
 
     wire [15:0] nextRelativePc = pc + { {8{second[7]}}, second };
-    wire [15:0] nextPc = (  state == STATE_READ_INSTR
+    wire [15:0] nextPc = ( state == STATE_READ_INSTR
                          | state == STATE_READ_2
                          | state == STATE_READ_3)
                          ? pc + 1
@@ -249,7 +249,9 @@ module Processor(
                               || (state == STATE_DJNZ2 && flagsOut[FLAG_INDEX_Z] == 1'b0 )
                               ) 
                                 ? nextRelativePc
-                                : pc;
+                                : (state == STATE_RET_I3) 
+                                  ? addr
+                                  : pc;
     assign memAddr = (state == STATE_READ_MEM1)
                    | (state == STATE_READ_MEM2)
                    | (state == STATE_WRITE_MEM)
@@ -605,11 +607,15 @@ module Processor(
                 end
                 4'hA: begin
                     $display("    ret");
-                    //TODO
+                    // 14 cycles
+                    // PCH, PCL
+                    state <= STATE_RET_I1;
                 end
                 4'hB: begin
                     $display("    iret");
-                    //TODO
+                    // 16 cycles
+                    // flags, PCH, PCL
+                    state <= STATE_IRET_I;
                 end
                 4'b110?: begin
                     $display("    %scf", instrH[0] ? "s" : "r");
@@ -764,6 +770,26 @@ module Processor(
             state <= instrL == 4'h3
                 ? STATE_INC_R_RR1
                 : STATE_FETCH_INSTR;
+        end
+
+        STATE_IRET_I: begin
+            aluMode <= ALU1_LD;
+            aluA <= readRegister8(sp[7:0]);
+            sp <= sp + 1;
+            register <= 8'hFC;
+            writeRegister <= 1;
+        end
+        STATE_RET_I1: begin
+            addr[15:8] <= readRegister8(sp[7:0]);
+            sp <= sp + 1;
+        end
+        STATE_RET_I2: begin
+            addr[7:0] <= readRegister8(sp[7:0]);
+            sp <= sp + 1;
+        end
+        STATE_RET_I3: begin
+            state <= STATE_FETCH_INSTR;
+            //TODO: for iret enable interrupts
         end
 
         endcase
