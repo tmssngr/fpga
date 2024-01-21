@@ -39,7 +39,6 @@
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
-        $display("%h", uut.proc.sp);
         `assert(uut.proc.sp, 'h80);
 
 // push r0

@@ -30,7 +30,6 @@ VCD info: dumpfile SoC.vcd opened for output.
     reg[ff] = 80
 
 0015: read instruction
-0080
   70
 0016: read 2nd byte
   70 e0
