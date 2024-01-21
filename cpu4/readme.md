@@ -12,7 +12,7 @@ Its aim is to be able to run the [Tiny computer](https://hc-ddr.hucki.net/wiki/d
   - [x] single-register ALU operations
     - [x] direct, e.g. `inc %22`
     - [x] indirect, e.g. `dec @%22`
-    - [ ] `inc r`
+    - [x] `inc r`
   - [ ] dual-register ALU operations
     - [x] `xxx r1, r2`
     - [x] `xxx r1, Ir2`

@@ -284,6 +284,12 @@ task asm_inc;
         asm2(8'h20, dst);
     end
 endtask
+task asm_inc_r;
+    input [3:0] dst;
+    begin
+        asm1({dst, 4'hE});
+    end
+endtask
 task asm_da;
     input [7:0] dst;
     begin

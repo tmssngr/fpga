@@ -589,7 +589,9 @@ module Processor(
             end
             4'hE: begin
                 $display("    inc r%h", instrH);
-                //TODO
+                register <= r4(instrH);
+                aluMode <= ALU1_INC;
+                state <= STATE_ALU1_OP;
             end
             4'hF: begin
                 casez (instrH)

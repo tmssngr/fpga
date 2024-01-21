@@ -19,10 +19,9 @@
     @(negedge clk);
         `assertRegister('h10, 'h09);
 
-// inc 10
-    repeat (3) @(negedge clk);
-        `assertInstr('h20);
-        `assertSecond('h10);
+// inc r0
+    repeat (2) @(negedge clk);
+        `assertInstr('h0E);
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assertState(STATE_ALU1_OP);

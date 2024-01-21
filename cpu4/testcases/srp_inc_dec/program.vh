@@ -5,7 +5,7 @@ initial begin
     label(L0_);
       asm_srp('h10);
       asm_ld_r_IM(0, 9);
-      asm_inc('h10);
+      asm_inc_r(4'h0);
       asm_dec('h10);
 
       asm_ld_r_IM(0, 8'h7F);
