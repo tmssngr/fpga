@@ -16,7 +16,7 @@ initial begin
       asm_tm_R_IM('hE3, 'b0000_0100);
       asm_jr(JC_NZ, M_003D);
 label(M_001D);
-      asm_ld_R_IM(P01M, 'hB6); // P00-P03 = A8-A11, Stack extern, P1x = AD0-AD7, P04-P04 = A12-A15, extended memory timing
+      asm_ld_R_IM(P01M, 'hB6); // P00-P03 = A8-A11, Stack intern, P1x = AD0-AD7, P04-P04 = A12-A15, extended memory timing
       asm_ld_R_IM(P3M, 8);     // P30-P33 input, P35-P37 output, P34 DM, Port 2 open-drain
       asm_ld_r_IM(4, 8);       // if %0812 is writable
       asm_ld_r_IM(5, 'h12);

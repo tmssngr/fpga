@@ -254,17 +254,22 @@ module Processor(
                                 : (state == STATE_RET_I3) 
                                   ? addr
                                   : pc;
-    assign memAddr = (state == STATE_READ_MEM1)
+    assign memAddr = (state == STATE_PUSH_E3)
+                   | (state == STATE_POP_E2)
+                   | (state == STATE_POP_E3)
+                   | (state == STATE_READ_MEM1)
                    | (state == STATE_READ_MEM2)
                    | (state == STATE_WRITE_MEM)
                      ? addr : pc;
     assign memDataWrite = aluA;
-    assign memWrite = (state == STATE_WRITE_MEM);
+    assign memWrite = (state == STATE_PUSH_E3)
+                    | (state == STATE_WRITE_MEM);
     assign memStrobe = (state == STATE_FETCH_INSTR)
                      | (state == STATE_WAIT_2 & ~isInstrSize1)
                      | (state == STATE_WAIT_3)
+                     | (state == STATE_POP_E2)
                      | (state == STATE_READ_MEM1)
-                     | (state == STATE_WRITE_MEM);
+                     | memWrite;
 
     always @(posedge clk) begin
         if (writeFlags) begin
@@ -352,13 +357,13 @@ module Processor(
                     // dst <- @SP
                     // SP <- SP + 1
                     register <= r8(second);
-                    state <= STATE_POP_I;
+                    state <= stackInternal ? STATE_POP_I : STATE_POP_E1;
                 end
                 4'h7: begin
                     $display("    push %h", second);
                     // 10/12+1 cycles
                     register <= r8(second);
-                    state <= STATE_PUSH_I1;
+                    state <= stackInternal ? STATE_PUSH_I1 : STATE_PUSH_E1;
                 end
                 4'h8: begin
                     $display("    decw %h", second);
@@ -395,13 +400,13 @@ module Processor(
                     $display("    pop @%h", second);
                     // 10+5 cycles
                     register <= readRegister8(second);
-                    state <= STATE_POP_I;
+                    state <= stackInternal ? STATE_POP_I : STATE_POP_E1;
                 end
                 4'h7: begin
                     $display("    push @%h", second);
                     // 12/14+1 cycles
                     register <= readRegister8(second);
-                    state <= STATE_PUSH_I1;
+                    state <= stackInternal ? STATE_PUSH_I1 : STATE_PUSH_E1;
                 end
                 4'h8: begin
                     $display("    decw @%h", second);
@@ -696,9 +701,33 @@ module Processor(
             state <= STATE_FETCH_INSTR;
         end
 
+        STATE_PUSH_E1: begin
+            sp <= sp - 1;
+        end
+        STATE_PUSH_E2: begin
+            aluA <= readRegister8(register);
+            addr <= sp;
+        end
+        STATE_PUSH_E3: begin
+            state <= STATE_FETCH_INSTR;
+        end
+
         STATE_POP_I: begin
             aluMode <= ALU1_LD;
             aluA <= readRegister8(sp[7:0]);
+            sp <= sp + 1;
+            writeRegister <= 1;
+            state <= STATE_FETCH_INSTR;
+        end
+
+        STATE_POP_E1: begin
+            addr <= sp;
+        end
+        STATE_POP_E2: begin
+        end
+        STATE_POP_E3: begin
+            aluMode <= ALU1_LD;
+            aluA <= memDataRead;
             sp <= sp + 1;
             writeRegister <= 1;
             state <= STATE_FETCH_INSTR;
