@@ -49,7 +49,9 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.register, 'h20);
-        `assertState(STATE_PUSH);
+        `assertState(STATE_PUSH1);
+    @(negedge clk);
+        `assertState(STATE_PUSH2);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);
@@ -63,7 +65,9 @@
         `assertState(STATE_DECODE);
     @(negedge clk);
         `assert(uut.proc.register, 'h21);
-        `assertState(STATE_PUSH);
+        `assertState(STATE_PUSH1);
+    @(negedge clk);
+        `assertState(STATE_PUSH2);
     @(negedge clk);
         `assertState(STATE_FETCH_INSTR);
     @(negedge clk);

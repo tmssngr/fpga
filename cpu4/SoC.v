@@ -344,6 +344,7 @@ module Processor(
                 end
                 4'h5: begin
                     $display("    pop %h", second);
+                    // 10+5 cycles
                     // dst <- @SP
                     // SP <- SP + 1
                     register <= r8(second);
@@ -351,9 +352,9 @@ module Processor(
                 end
                 4'h7: begin
                     $display("    push %h", second);
-                    sp <= sp - 1;
+                    // 10/12+1 cycles
                     register <= r8(second);
-                    state <= STATE_PUSH;
+                    state <= STATE_PUSH1;
                 end
                 4'h8: begin
                     $display("    decw %h", second);
@@ -670,7 +671,10 @@ module Processor(
             state <= STATE_FETCH_INSTR;
         end
 
-        STATE_PUSH: begin
+        STATE_PUSH1: begin
+            sp <= sp - 1;
+        end
+        STATE_PUSH2: begin
             aluMode <= ALU1_LD;
             aluA <= readRegister8(register);
             register <= sp[7:0];
