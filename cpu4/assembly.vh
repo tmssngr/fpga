@@ -404,12 +404,17 @@ task asm_ldci_Irr_Ir;
 	end
 endtask
 
+task asm_call;
+    input [15:0] addr;
+    begin
+        asm3(8'hD6, addr[15:8], addr[7:0]);
+    end
+endtask
 task asm_ret;
     begin
         asm1(8'hAF);
     end
 endtask
-
 task asm_iret;
     begin
         asm1(8'hBF);

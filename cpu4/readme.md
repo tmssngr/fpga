@@ -52,7 +52,7 @@ Its aim is to be able to run the [Tiny computer](https://hc-ddr.hucki.net/wiki/d
       - [x] `push R`
       - [x] `push IR`
       - [ ] `call IRR`
-      - [ ] `call DA`
+      - [x] `call DA`
       - [x] `ret`
       - [x] `iret`
     - [ ] external stack

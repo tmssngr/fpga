@@ -245,7 +245,9 @@ module Processor(
                          | state == STATE_READ_2
                          | state == STATE_READ_3)
                          ? pc + 1
-                         : ( state == STATE_DECODE & isJumpDA & takeBranch) 
+                         : ((state == STATE_DECODE & isJumpDA & takeBranch)
+                           |(state == STATE_CALL_I3)
+                           |(state == STATE_CALL_E3))
                             ? directAddress
                             : ( (state == STATE_DECODE & isJumpRel & takeBranch)
                               || (state == STATE_DJNZ2 && flagsOut[FLAG_INDEX_Z] == 1'b0 )
@@ -257,12 +259,16 @@ module Processor(
     assign memAddr = (state == STATE_PUSH_E3)
                    | (state == STATE_POP_E2)
                    | (state == STATE_POP_E3)
+                   | (state == STATE_CALL_E2)
+                   | (state == STATE_CALL_E3)
                    | (state == STATE_READ_MEM1)
                    | (state == STATE_READ_MEM2)
                    | (state == STATE_WRITE_MEM)
                      ? addr : pc;
     assign memDataWrite = aluA;
     assign memWrite = (state == STATE_PUSH_E3)
+                    | (state == STATE_CALL_E2)
+                    | (state == STATE_CALL_E3)
                     | (state == STATE_WRITE_MEM);
     assign memStrobe = (state == STATE_FETCH_INSTR)
                      | (state == STATE_WAIT_2 & ~isInstrSize1)
@@ -517,6 +523,7 @@ module Processor(
                 end
                 4'hD: begin
                     $display("    call IRR%h", directAddress);
+                    // 20 cycles
                     //TODO
                 end
                 4'hE: begin
@@ -547,7 +554,10 @@ module Processor(
                 end
                 4'hD: begin
                     $display("    call %h", directAddress);
-                    //TODO
+                    // 20 cycles
+                    // push PCL, PCH
+                    sp <= sp - 1;
+                    state <= stackInternal ? STATE_CALL_I1 : STATE_CALL_E1;
                 end
                 4'hE: begin
                     $display("    ld %h, #%h", second, third);
@@ -801,6 +811,34 @@ module Processor(
             state <= instrL == 4'h3
                 ? STATE_INC_R_RR1
                 : STATE_FETCH_INSTR;
+        end
+
+        STATE_CALL_I1: begin
+            sp <= sp - 1;
+            aluMode <= ALU1_LD;
+            aluA <= pc[7:0];
+            register <= sp[7:0];
+            writeRegister <= 1;
+        end
+        STATE_CALL_I2: begin
+            aluA <= pc[15:8];
+            register <= sp[7:0];
+            writeRegister <= 1;
+        end
+        STATE_CALL_I3: begin
+            state <= STATE_FETCH_INSTR;
+        end
+        STATE_CALL_E1: begin
+            addr <= sp;
+            sp <= sp - 1;
+            aluA <= pc[7:0];
+        end
+        STATE_CALL_E2: begin
+            addr <= sp;
+            aluA <= pc[15:8];
+        end
+        STATE_CALL_E3: begin
+            state <= STATE_FETCH_INSTR;
         end
 
         STATE_IRET_I: begin
