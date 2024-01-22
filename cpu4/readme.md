@@ -55,7 +55,7 @@ Its aim is to be able to run the [Tiny computer](https://hc-ddr.hucki.net/wiki/d
       - [x] `call DA`
       - [x] `ret`
       - [x] `iret`
-    - [ ] external stack
+    - [x] external stack
 - [ ] port 2
 - [ ] port 3
 - [ ] Counters

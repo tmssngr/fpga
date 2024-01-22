@@ -21,6 +21,7 @@ call :test djnz
 call :test push_pop
 call :test push_pop_external
 call :test ret
+call :test ret_external
 call :test u8830
 
 pause

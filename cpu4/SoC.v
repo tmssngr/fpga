@@ -253,7 +253,8 @@ module Processor(
                               || (state == STATE_DJNZ2 && flagsOut[FLAG_INDEX_Z] == 1'b0 )
                               ) 
                                 ? nextRelativePc
-                                : (state == STATE_RET_I3) 
+                                : (state == STATE_RET_I3
+                                  |state == STATE_RET_E6)
                                   ? addr
                                   : pc;
     assign memAddr = (state == STATE_PUSH_E3)
@@ -261,6 +262,11 @@ module Processor(
                    | (state == STATE_POP_E3)
                    | (state == STATE_CALL_E2)
                    | (state == STATE_CALL_E3)
+                   | (state == STATE_IRET_E2)
+                   | (state == STATE_RET_E2)
+                   | (state == STATE_RET_E3)
+                   | (state == STATE_RET_E4)
+                   | (state == STATE_RET_E5)
                    | (state == STATE_READ_MEM1)
                    | (state == STATE_READ_MEM2)
                    | (state == STATE_WRITE_MEM)
@@ -274,6 +280,9 @@ module Processor(
                      | (state == STATE_WAIT_2 & ~isInstrSize1)
                      | (state == STATE_WAIT_3)
                      | (state == STATE_POP_E2)
+                     | (state == STATE_IRET_E2)
+                     | (state == STATE_RET_E2)
+                     | (state == STATE_RET_E4)
                      | (state == STATE_READ_MEM1)
                      | memWrite;
 
@@ -626,13 +635,13 @@ module Processor(
                     $display("    ret");
                     // 14 cycles
                     // PCH, PCL
-                    state <= STATE_RET_I1;
+                    state <= stackInternal ? STATE_RET_I1 : STATE_RET_E1;
                 end
                 4'hB: begin
                     $display("    iret");
                     // 16 cycles
                     // flags, PCH, PCL
-                    state <= STATE_IRET_I;
+                    state <= stackInternal ? STATE_IRET_I : STATE_IRET_E1;
                 end
                 4'b110?: begin
                     $display("    %scf", instrH[0] ? "s" : "r");
@@ -857,6 +866,37 @@ module Processor(
             sp <= sp + 1;
         end
         STATE_RET_I3: begin
+            state <= STATE_FETCH_INSTR;
+            //TODO: for iret enable interrupts
+        end
+        STATE_IRET_E1: begin
+            addr <= sp;
+            sp <= sp + 1;
+        end
+        STATE_IRET_E2: begin
+            aluMode <= ALU1_LD;
+            aluA <= memDataRead;
+            register <= FLAGS;
+            writeRegister <= 1;
+        end
+        STATE_RET_E1: begin
+            addr <= sp;
+            sp <= sp + 1;
+        end
+        STATE_RET_E2: begin
+        end
+        STATE_RET_E3: begin
+            aluA <= memDataRead;// temp
+            addr <= sp;
+            sp <= sp + 1;
+        end
+        STATE_RET_E4: begin
+        end
+        STATE_RET_E5: begin
+            addr[15:8] <= aluA;
+            addr[7:0] <= memDataRead;
+        end
+        STATE_RET_E6: begin
             state <= STATE_FETCH_INSTR;
             //TODO: for iret enable interrupts
         end
