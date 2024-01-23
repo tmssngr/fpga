@@ -1,2 +1,0 @@
-VCD info: dumpfile Alu.vcd opened for output.
-testAlu: SUCCESS
